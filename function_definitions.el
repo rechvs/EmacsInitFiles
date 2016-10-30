@@ -6,16 +6,6 @@
   "Turn abbrev mode ON."
   (abbrev-mode 1))
 
-(defun my-auctex-man ()
-  "Go to bookmark 'auctex-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "auctex-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
 (defun my-comment-or-uncomment (ARG1 ARG2)
   "When region is not active, comment the current line if uncommented, otherwise uncomment it. When region is active, comment uncommented lines and uncomment commented lines that are at least partly contained in region. Lines consisting only of a newline character or of whitespace and a newline character are skipped."
   (interactive "r")
@@ -133,46 +123,6 @@ If point is not on a blank line do nothing."
  (forward-line (- (/ ARG 2) 1))))))
       (message "Current line is not blank\."))))
 
-(defun my-elisp-int ()
-  "Go to bookmark 'elisp-int', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "elisp-int")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
-(defun my-elisp-ref ()
-  "Go to bookmark 'elisp-ref', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "elisp-ref")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
-(defun my-emacs-man ()
-  "Go to bookmark 'emacs-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "emacs-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
-(defun my-ess-man ()
-  "Go to bookmark 'ess-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "ess-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
 ;(defun my-glossary-entry (name)
 ;  "Insert \paragraph and \label using the input string."
 ;  (interactive "sName des Eintrags: ")
@@ -186,15 +136,18 @@ If point is not on a blank line do nothing."
 ;  "Bind my-glossary-entry to C-c C-a."
 ;  (local-set-key "\C-c\C-a" 'my-glossary-entry))
 
-(defun my-gnus-man ()
-  "Go to bookmark 'gnus-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "gnus-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
+(defun my-follow-bookmark (BKMK)
+  "Call (`delete-other-windows'), open bookmark BKMK in two vertically separated windows and activate follow-mode."
+  (interactive
+   (list
+    (let (BKMKS)
+      (bookmark-load "~/.emacs.d/bookmarks" t)
+      (setq BKMKS (bookmark-all-names))
+      (setq BKMK (completing-read "Bookmark: " BKMKS))
+      (bookmark-jump BKMK)
+   (delete-other-windows)
+   (split-window-horizontally)
+   (follow-mode t)))))
 
 (defun my-hiwi-ssh-login-server ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
@@ -228,16 +181,6 @@ If point is not on a blank line do nothing."
 (defun my-load-bookmarks-on-startup ()
   "Uses the function bookmark-load."
   (bookmark-load "~/.emacs.d/bookmarks" "t"))
-
-(defun my-mail-man ()
-  "Go to bookmark 'mail-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "mail-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
 
 (defun my-move-end-of-line ()
   "If point is not at the end of the current line, move point to the end of the current visual line. If point is at the end of the current visual line, move point to the beginning of the last whitespace character sequence on the current visual line."
@@ -289,26 +232,6 @@ If point is not on a blank line do nothing."
         (search-backward-regexp "[^ ]" LINEBEGINNING)
         (forward-char)
         (newline-and-indent)))))
-
-(defun my-octave-man ()
-  "Go to bookmark 'octave-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "octave-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
-
-(defun my-org-man ()
-  "Go to bookmark 'org-man', split frame into two windows and enable follow-mode."
-  (interactive)
-;  (bookmark-bmenu-save "~/.emacs.d/bookmarks")
-  (bookmark-load "~/.emacs.d/bookmarks" "t")
-  (bookmark-jump "org-man")
-  (delete-other-windows)
-  (split-window-horizontally)
-  (follow-mode "t"))
 
 (defun my-other-window ()
   "Call (`other-window' 1). Intended for use in keybinding."
