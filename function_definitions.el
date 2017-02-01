@@ -149,10 +149,15 @@ If point is not on a blank line do nothing."
    (split-window-horizontally)
    (follow-mode t)))))
 
-(defun my-hiwi-ssh-login-server ()
+(defun my-hiwi-ssh-login-bayeos-server ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
   (interactive)
   (find-file "/ssh:aknohl@134.76.19.50:/home/aknohl"))
+
+(defun my-hiwi-ssh-login-tss-server ()
+  "Visit directory `/home/lukas´ on host `134.76.19.175 ´ as user `lukas´ via `ssh´."
+  (interactive)
+  (find-file "/ssh:lukas@134.76.19.175:/home/lukas"))
 
 (defun my-immediately-switch-to-buffer ()
   "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'"
