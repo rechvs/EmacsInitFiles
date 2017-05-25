@@ -18,6 +18,7 @@
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-symbol-additions)
 (add-hook 'LaTeX-mode-hook 'my-visual-line-mode-on)
 (add-hook 'LaTeX-mode-hook 'my-abbrev-mode-on)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
 (add-hook 'lisp-interaction-mode-hook 'my-Lisp-Interaction-mode-bindings)
 
