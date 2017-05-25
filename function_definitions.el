@@ -2,6 +2,18 @@
 ;; Miscellaneous functions ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun my-log-edit-insert-message-template ()
+  "Custom version of `log-edit-insert-message-template'. Insert template with Author but without Summary."
+  (interactive)
+  (when (or (called-interactively-p 'interactive)
+            (log-edit-empty-buffer-p))
+    ;; (insert "Summary: ")
+    (when log-edit-setup-add-author
+      ;; (insert "\nAuthor: "))
+      (insert "Author: "))
+    ;; (insert "\n\n")
+    (message-position-point)))
+
 (defun my-abbrev-mode-on ()
   "Turn abbrev mode ON."
   (abbrev-mode 1))
@@ -149,18 +161,18 @@ If point is not on a blank line do nothing."
    (split-window-horizontally)
    (follow-mode t)))))
 
-(defun my-hiwi-ssh-login-bayeos-server ()
+(defun my-hiwi-ssh-bayeos ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
   (interactive)
   (find-file "/ssh:aknohl@134.76.19.50:/home/aknohl"))
 
-(defun my-hiwi-ssh-login-tss-server ()
+(defun my-hiwi-ssh-tss ()
   "Visit directory `/home/lukas´ on host `134.76.19.175 ´ as user `lukas´ via `ssh´."
   (interactive)
   (find-file "/ssh:lukas@134.76.19.175:/home/lukas"))
 
 (defun my-immediately-switch-to-buffer ()
-  "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'"
+  "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'."
   (interactive)
   (let (WINDOW-LIST (WINDOW_NR 0) (BUFFER-NAME-LIST (list "")) (BUFFER_NR 0) (BUFFER_NEXT_IN_ROW ""))
     (if (string-match "\ \*Minibuf-+[0-9]*[0-9]\*" (buffer-name (current-buffer)))
@@ -168,7 +180,7 @@ If point is not on a blank line do nothing."
       (progn
         (setq WINDOW-LIST (window-list))
         (while (<= WINDOW_NR (- (length WINDOW-LIST) 1))
-	(setf (nth WINDOW_NR BUFFER-NAME-LIST) (substring (nth 3 (split-string (pp-to-string (nth WINDOW_NR WINDOW-LIST)) " ")) 0 -1))
+	(setf (nth WINDOW_NR BUFFER-NAME-LIST) (substring (nth 3 (split-string (prin1-to-string (nth WINDOW_NR WINDOW-LIST) nil) " ")) 0 -1))
 	(if (< WINDOW_NR (- (length WINDOW-LIST) 1))
 	    (setq BUFFER-NAME-LIST (append BUFFER-NAME-LIST (list ""))))
 	(setq WINDOW_NR (+ WINDOW_NR 1)))
@@ -289,7 +301,8 @@ If point is not on a blank line do nothing."
       (switch-to-buffer "*R*")
     (progn
       (switch-to-buffer "*R*")
-      (ess-request-a-process nil t nil))))
+      ;; (ess-request-a-process nil t nil))))
+      (R))))
 
 (defun my-string-match-list (LIST STRING)
   "Match string STRING against the elements of list LIST (using `string-match'). Return t upon finding the first match, otherwise retunr nil."
@@ -305,7 +318,7 @@ If point is not on a blank line do nothing."
 	  (setq ELT (+ 1 ELT))))))
 
 (defun my-switch-windows (ARG)
-  "If exactly two vertically separated windows are displayed, switch the buffers in them. When called without a prefix argument select the previously selected buffer. When called with a prefix argument select the previously unselected buffer."
+  "If exactly two vertically separated windows are displayed, switch the buffers in them. When called without a prefix argument, select the previously selected buffer. When called with a prefix argument, select the previously unselected buffer."
   (interactive "P")
   (let (BUFFER_CURRENT)
     (if (= (length (window-list)) 2)
