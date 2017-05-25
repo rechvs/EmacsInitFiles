@@ -2,18 +2,6 @@
 ;; More or less self documenting settings ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq make-backup-files nil)
-
-(setq auto-save-timeout 600)
-
-(setq auto-save-interval 50)
-
-(setq TeX-auto-save t)
-
-(setq TeX-master nil)
-
-(setq TeX-parse-self t)
-
 (put 'upcase-region 'disabled nil)
 
 (put 'narrow-to-region 'disabled nil)
