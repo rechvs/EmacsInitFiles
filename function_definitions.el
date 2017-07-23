@@ -2,18 +2,6 @@
 ;; Miscellaneous functions ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun my-log-edit-insert-message-template ()
-  "Custom version of `log-edit-insert-message-template'. Insert template with Author but without Summary."
-  (interactive)
-  (when (or (called-interactively-p 'interactive)
-            (log-edit-empty-buffer-p))
-    ;; (insert "Summary: ")
-    (when log-edit-setup-add-author
-      ;; (insert "\nAuthor: "))
-      (insert "Author: "))
-    ;; (insert "\n\n")
-    (message-position-point)))
-
 (defun my-abbrev-mode-on ()
   "Turn abbrev mode ON."
   (abbrev-mode 1))
@@ -198,6 +186,18 @@ If point is not on a blank line do nothing."
 (defun my-load-bookmarks-on-startup ()
   "Uses the function bookmark-load."
   (bookmark-load "~/.emacs.d/bookmarks" "t"))
+
+(defun my-log-edit-insert-message-template ()
+  "Custom version of `log-edit-insert-message-template'. Insert template with Author but without Summary."
+  (interactive)
+  (when (or (called-interactively-p 'interactive)
+            (log-edit-empty-buffer-p))
+    ;; (insert "Summary: ")
+    (when log-edit-setup-add-author
+      ;; (insert "\nAuthor: "))
+      (insert "Author: "))
+    ;; (insert "\n\n")
+    (message-position-point)))
 
 (defun my-move-end-of-line ()
   "If point is not at the end of the current line, move point to the end of the current visual line. If point is at the end of the current visual line, move point to the beginning of the last whitespace character sequence on the current visual line."
