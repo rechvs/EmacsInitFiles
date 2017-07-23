@@ -2,18 +2,6 @@
 ;; Miscellaneous functions ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun my-log-edit-insert-message-template ()
-  "Custom version of `log-edit-insert-message-template'. Insert template with Author but without Summary."
-  (interactive)
-  (when (or (called-interactively-p 'interactive)
-            (log-edit-empty-buffer-p))
-    ;; (insert "Summary: ")
-    (when log-edit-setup-add-author
-      ;; (insert "\nAuthor: "))
-      (insert "Author: "))
-    ;; (insert "\n\n")
-    (message-position-point)))
-
 (defun my-abbrev-mode-on ()
   "Turn abbrev mode ON."
   (abbrev-mode 1))
@@ -148,6 +136,41 @@ If point is not on a blank line do nothing."
 ;  "Bind my-glossary-entry to C-c C-a."
 ;  (local-set-key "\C-c\C-a" 'my-glossary-entry))
 
+(defun my-find-region-or-at-point ()
+  "If region is active, use text in region as the filename to visit.
+Otherwise use the text at point as the filename to visit. The following
+characters delimit the filename from surrounding text (see argument STRING of
+`skip-chars-forward'): [][:][:space:]
+If it exists, the file is visited via `find-file'. An empty filename is
+ignored."
+  (interactive)
+  (let (FILENAME)
+    ;; If the region is active, obtain the filename from it.
+    (if (region-active-p)
+        (progn
+	(setq FILENAME (buffer-substring-no-properties (region-beginning) (region-end)))
+	(deactivate-mark t))
+      ;; If the region is not active, obtain the filename by scanning for text at point enclosed in whitespace.
+      (let (P1 P2 DELIMCHARS)
+        (setq DELIMCHARS "^[][:][:space:]")
+        (save-excursion (skip-chars-backward DELIMCHARS (line-beginning-position))
+		    (setq P1 (point)))
+        (save-excursion (skip-chars-forward DELIMCHARS (line-end-position))
+		    (setq P2 (point)))
+        (setq FILENAME (buffer-substring-no-properties P1 P2))))
+    ;; If FILENAME is empty, message the user about it, but do not visit it.
+    (if (string= "" FILENAME)
+        (message "Empty filename ignored.")
+      ;; If it exists, visit FILENAME.
+      (if (file-exists-p FILENAME)
+	(find-file FILENAME)
+        ;; If FILENAME does not exist, message the user about it.
+        ;; In order to distinguish FILENAME from the rest of the message, we can use either quotation marks...
+        ;; (message "File \"%s\" does not exist." FILENAME)))))
+        ;; ...or text color.
+        (add-face-text-property 0 (length FILENAME) '(:foreground "blue") t FILENAME)
+        (message "File %s does not exist." FILENAME)))))
+
 (defun my-follow-bookmark (BKMK)
   "Call (`delete-other-windows'), open bookmark BKMK in two vertically separated windows and activate follow-mode."
   (interactive
@@ -198,6 +221,18 @@ If point is not on a blank line do nothing."
 (defun my-load-bookmarks-on-startup ()
   "Uses the function bookmark-load."
   (bookmark-load "~/.emacs.d/bookmarks" "t"))
+
+(defun my-log-edit-insert-message-template ()
+  "Custom version of `log-edit-insert-message-template'. Insert template with Author but without Summary."
+  (interactive)
+  (when (or (called-interactively-p 'interactive)
+            (log-edit-empty-buffer-p))
+    ;; (insert "Summary: ")
+    (when log-edit-setup-add-author
+      ;; (insert "\nAuthor: "))
+      (insert "Author: "))
+    ;; (insert "\n\n")
+    (message-position-point)))
 
 (defun my-move-end-of-line ()
   "If point is not at the end of the current line, move point to the end of the current visual line. If point is at the end of the current visual line, move point to the beginning of the last whitespace character sequence on the current visual line."
