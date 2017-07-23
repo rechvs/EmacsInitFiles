@@ -301,7 +301,6 @@ If point is not on a blank line do nothing."
       (switch-to-buffer "*R*")
     (progn
       (switch-to-buffer "*R*")
-      ;; (ess-request-a-process nil t nil))))
       (R))))
 
 (defun my-string-match-list (LIST STRING)
