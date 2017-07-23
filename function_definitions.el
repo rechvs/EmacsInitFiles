@@ -140,7 +140,7 @@ If point is not on a blank line do nothing."
   "If region is active, use text in region as the filename to visit.
 Otherwise use the text at point as the filename to visit. The following
 characters delimit the filename from surrounding text (see argument STRING of
-`skip-chars-forward'): [][:][:space:]
+`skip-chars-forward'): [][{}():][:space:]
 If it exists, the file is visited via `find-file'. An empty filename is
 ignored."
   (interactive)
@@ -152,7 +152,7 @@ ignored."
 	(deactivate-mark t))
       ;; If the region is not active, obtain the filename by scanning for text at point enclosed in whitespace.
       (let (P1 P2 DELIMCHARS)
-        (setq DELIMCHARS "^[][:][:space:]")
+        (setq DELIMCHARS "^[][{}():][:space:]")
         (save-excursion (skip-chars-backward DELIMCHARS (line-beginning-position))
 		    (setq P1 (point)))
         (save-excursion (skip-chars-forward DELIMCHARS (line-end-position))
