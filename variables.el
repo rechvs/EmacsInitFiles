@@ -29,6 +29,12 @@
   "A list containing buffer names as regular expressions which should not be switched to by `my-immediately-switch-to-buffer'."
   :type '(repeat regexp))
 
+;; Define a customizable variable "my-find-region-or-at-point-delim-chars" which is used as the regexp of delimiting characters by "my-find-region-or-at-point".
+(defcustom my-find-region-or-at-point-delim-chars
+  '"[][{}():\"'„“”][:space:]"
+  "A string of characters used as delimiting characters by `my-find-region-or-at-point' (see argument STRING of `skip-chars-forward')."
+  :type '(string))
+
 ;; add `parencite´ and `textcite´ to list of symbols known in style `article´ and dialect `LaTeX-dialect´ (s. AUCTeX info 5.6.2) such that AUCTeX can ask for an optional argument:
 (eval-after-load "latex"
   '(progn
