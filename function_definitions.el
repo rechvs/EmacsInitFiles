@@ -140,7 +140,7 @@ If point is not on a blank line do nothing."
   "If region is active, use text in region as the filename to visit.
 Otherwise use the text at point as the filename to visit. The following
 characters delimit the filename from surrounding text (see argument STRING of
-`skip-chars-forward'): [][{}():\"][:space:]
+`skip-chars-forward'): [][{}():\"'„“”][:space:]
 If it exists, the file is visited via `find-file'. An empty filename is
 ignored."
   (interactive)
@@ -149,10 +149,11 @@ ignored."
     (if (region-active-p)
         (progn
 	(setq FILENAME (buffer-substring-no-properties (region-beginning) (region-end)))
-	(deactivate-mark t))
-      ;; If the region is not active, obtain the filename by scanning for text at point enclosed in whitespace.
+	;; (deactivate-mark t)
+	)
+      ;; If the region is not active, obtain the filename by scanning for text at point enclosed in the characters mentioned in function description.
       (let (P1 P2 DELIMCHARS)
-        (setq DELIMCHARS "^[][{}():\"][:space:]")
+        (setq DELIMCHARS "^[][{}():\"'„“”][:space:]")
         (save-excursion (skip-chars-backward DELIMCHARS (line-beginning-position))
 		    (setq P1 (point)))
         (save-excursion (skip-chars-forward DELIMCHARS (line-end-position))
@@ -198,24 +199,39 @@ ignored."
   "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'."
   (interactive)
   (let (WINDOW-LIST (WINDOW_NR 0) (BUFFER-NAME-LIST (list "")) (BUFFER_NR 0) (BUFFER_NEXT_IN_ROW ""))
+    ;; If we are in the minibuffer, inform about this and do nothing else.
     (if (string-match "\ \*Minibuf-+[0-9]*[0-9]\*" (buffer-name (current-buffer)))
         (display-message-or-buffer "Currently in minibuffer.")
+      ;; Else, do the following.
       (progn
+        ;; Store the window list in "WINDOW-LIST".
         (setq WINDOW-LIST (window-list))
+        ;; While "WINDOW_NR" (default: 0) is not the same as the length of "WINDOW-LIST" minus 1, ...
         (while (<= WINDOW_NR (- (length WINDOW-LIST) 1))
-	(setf (nth WINDOW_NR BUFFER-NAME-LIST) (substring (nth 3 (split-string (prin1-to-string (nth WINDOW_NR WINDOW-LIST) nil) " ")) 0 -1))
+	;; ...set element nr. "WINDOW_NR" of list "BUFFER-NAME-LIST" to the name of the buffer displayed in window nr. "WINDOW_NR" as given in "WINDOW-LIST"... (See Elisp manual at "elisp.info::Window Type" on the hash notation of windows in Elisp on which this approach is based.)
+	(setf (nth WINDOW_NR BUFFER-NAME-LIST) (nth 1 (split-string (prin1-to-string (nth WINDOW_NR WINDOW-LIST) nil) "#<window [0-9]+ on " nil ">")))
+	;; If "WINDOW_NR" is less than the length of "WINDOW-LIST" minus 1,...
 	(if (< WINDOW_NR (- (length WINDOW-LIST) 1))
+	    ;; ...append an empty string to "BUFFER-NAME-LIST".
 	    (setq BUFFER-NAME-LIST (append BUFFER-NAME-LIST (list ""))))
+	;; ...and step "WINDOR_NR".
 	(setq WINDOW_NR (+ WINDOW_NR 1)))
-        (if
-	  (eq last-command 'my-immediately-switch-to-buffer)
+        ;; If the previous command was "my-immediately-switch-to-buffer",...
+        (if (eq last-command 'my-immediately-switch-to-buffer)
+	  ;; ...step variable "my-immediately-switch-to-buffer-counter".
 	  (setq my-immediately-switch-to-buffer-counter (+ 1 my-immediately-switch-to-buffer-counter))
+	;; Else, set variable "my-immediately-switch-to-buffer-counter" to 1.
 	(setq my-immediately-switch-to-buffer-counter 1))
+        ;; Set "BUFFER_NEXT_IN_ROW" to the buffer name at position "my-immediately-switch-to-buffer-counter" in the list given by "buffer-list".
         (setq BUFFER_NEXT_IN_ROW (buffer-name (nth my-immediately-switch-to-buffer-counter (buffer-list))))
+        ;; While "BUFFER_NEXT_IN_ROW" is a member of "BUFFER-NAME-LIST" or is mentioned in variable "my-immediately-switch-to-buffer-excluded-buffers",...
         (while (or (member BUFFER_NEXT_IN_ROW BUFFER-NAME-LIST)
 	         (my-string-match-list my-immediately-switch-to-buffer-excluded-buffers BUFFER_NEXT_IN_ROW))
+	;; ...step variable "my-immediately-switch-to-buffer-counter"...
 	(setq my-immediately-switch-to-buffer-counter (+ 1 my-immediately-switch-to-buffer-counter))
+	;; ...and set "BUFFER_NEXT_IN_ROW" to the buffer name at position "my-immediately-switch-to-buffer-counter" in the list given by "buffer-list".
 	(setq BUFFER_NEXT_IN_ROW (buffer-name (nth my-immediately-switch-to-buffer-counter (buffer-list)))))
+        ;; Switch to buffer "BUFFER_NEXT_IN_ROW".
         (switch-to-buffer BUFFER_NEXT_IN_ROW)))))
 
 (defun my-load-bookmarks-on-startup ()
@@ -285,6 +301,9 @@ ignored."
         (forward-char)
         (newline-and-indent)))))
 
+(defun my-org-confirm-babel-evaluate (lang body)
+  (not (string= lang "R")))
+
 (defun my-other-window ()
   "Call (`other-window' 1). Intended for use in keybinding."
   (interactive)
@@ -339,7 +358,7 @@ ignored."
       (R))))
 
 (defun my-string-match-list (LIST STRING)
-  "Match string STRING against the elements of list LIST (using `string-match'). Return t upon finding the first match, otherwise retunr nil."
+  "Match string STRING against the elements of list LIST (using `string-match'). Return t upon finding the first match, otherwise return nil."
   (if (not (listp LIST))
       (error "LIST must be a list object"))
   (if (not (stringp STRING))
@@ -378,6 +397,83 @@ ignored."
 	    (if (not (eq ARG nil))
 	        (other-window 1)))))
       (message "There are more or less than two windows displayed."))))
+
+(defun my-visit-file-add-to-git-whitelist ()
+  "Ask for a filename. If the file is accessible and not already mentioned in \"~/.gitignore\", ask for a comment, and add comment and negated filename to \"~/.gitignore\". If accessible, visit the file."
+  (interactive)
+  (let (cmmnt curbuflst dir flnm flnmexp gitigbuf gitigflnm gitigflnmexp)
+    (catch 'outer
+      (catch 'inner
+        ;; Store current buffer list in "curbuflst".
+        (setq curbuflst (buffer-list))
+        ;; Store path to "~/.gitignore" in "gitigflnm".
+        (setq gitigflnm "~/.gitignore")
+        ;; Store expansion of "gitigflnm" in "gitigflnmexp".
+        (setq gitigflnmexp (expand-file-name gitigflnm))
+        ;; Ask for filename, store it in "flnm".
+        (setq flnm (read-file-name "Filename: "))
+        ;; Store expansion of "flnm" in "flnmexp".
+        (setq flnmexp (expand-file-name flnm))
+        ;; Store directory component of "flnm" in "dir".
+        (setq dir (file-name-directory flnm))
+        ;; Add text properties to strings for pretty printing.
+        (add-face-text-property 0 (length dir) '(:foreground "blue") t dir)
+        (add-face-text-property 0 (length flnm) '(:foreground "blue") t flnm)
+        (add-face-text-property 0 (length flnmexp) '(:foreground "blue") t flnmexp)
+        (add-face-text-property 0 (length gitigflnm) '(:foreground "blue") t gitigflnm)
+        ;; Check whether "flnm" and "dir" are accessible/readable/writable, stop if not.
+        (if (not (file-accessible-directory-p (file-name-directory flnm)))
+	  (throw 'outer (message "Directory %s is not accessible." dir)))
+        (if (and (file-exists-p flnm) (not (file-readable-p flnm)))
+	  (throw 'outer (message "File %s is not readable." flnm)))
+        (if (and (file-exists-p flnm) (not (file-writable-p flnm)))
+	  (throw 'outer (message "File %s is not writable." flnm)))
+        ;; Check whether file "gitigflnmexp" is readable/writable, stop if not.
+        (if (and (file-exists-p gitigflnmexp) (not (file-readable-p gitigflnmexp)))
+	  (throw 'outer (message "File %s is not readable." gitigflnm)))
+        (if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
+	  (throw 'outer (message "File %s is not writable." gitigflnm)))
+        ;; Visit "gitigflnmexp" and store the resulting buffer in "gitigbuf".
+        (save-excursion
+	(setq gitigbuf (find-file-noselect gitigflnmexp))
+	;; Make "gitigbuf" the current buffer.
+	(set-buffer gitigbuf)
+	(beginning-of-buffer)
+	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
+	(if (search-forward-regexp (concat "^" flnm "$") nil t)
+	    (throw 'inner (message "Filename %s is already present in %s’s blacklist." flnm gitigflnm)))
+	(if (search-forward-regexp (concat "^" flnmexp "$") nil t)
+	    (throw 'inner (message "Filename %s is already present in %s’s blacklist." flnmexp gitigflnm)))
+	(if (search-forward-regexp (concat "^!" flnm "$") nil t)
+	    (throw 'inner (message "Filename %s is already present in %s’s whitelist." flnm gitigflnm)))
+	(if (search-forward-regexp (concat "^!" flnmexp "$") nil t)
+	    (throw 'inner (message "Filename %s is already present in %s’s whitelist." flnmexp gitigflnm)))
+	;; Ask for a comment.
+	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
+	;; Trim comment of leading and trailing whitespace.
+	(setq cmmnt (replace-regexp-in-string "^[ ]+" "" cmmnt))
+	(setq cmmnt (replace-regexp-in-string "[ ]+$" "" cmmnt))
+	;; If necessary, prepend "# " to the comment.
+	(if (not (string-equal "#" (substring cmmnt 0 1)))
+	    (setq cmmnt (concat "# " cmmnt)))
+	;; If necessary, append a newline to "gitigbuf" (before appending the comment).
+	(end-of-buffer)
+	(beginning-of-line)
+	(if (= (point) (point-max))
+	    (insert "\n")
+	  (end-of-line)
+	  (insert "\n\n"))
+	;; Remove text properties from "flnm".
+	(set-text-properties 0 (length flnm) nil flnm)
+	;; Append comment, negated "flnm" and trailing newline to "gitigbuf".
+	(insert cmmnt "\n" "!" flnm "\n")
+	;; Save "gitigbuf".
+	(save-buffer)
+	;; If "gitigbuf" is not a member of "curbuflst", kill "gitigbuf".
+	(if (not (member gitigbuf curbuflst))
+	    (kill-buffer gitigbuf))))
+      ;; Visit the specified file.
+      (find-file flnm))))
 
 (defun my-visit-multiple-files (LIST)
   "Visit the files mentioned in LIST in the given order."
