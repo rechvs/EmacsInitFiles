@@ -138,9 +138,9 @@ If point is not on a blank line do nothing."
 
 (defun my-find-region-or-at-point ()
   "If region is active, use text in region as the filename to visit.
-Otherwise use the text at point as the filename to visit. The following
-characters delimit the filename from surrounding text (see argument STRING of
-`skip-chars-forward'): [][{}():\"'„“”][:space:]
+Otherwise use the text at point as the filename to visit. The
+characters delimiting the filename from surrounding text are set via
+ `my-find-region-or-at-point-delim-chars'. 
 If it exists, the file is visited via `find-file'. An empty filename is
 ignored."
   (interactive)
@@ -151,9 +151,9 @@ ignored."
 	(setq FILENAME (buffer-substring-no-properties (region-beginning) (region-end)))
 	;; (deactivate-mark t)
 	)
-      ;; If the region is not active, obtain the filename by scanning for text at point enclosed in the characters mentioned in function description.
+      ;; If the region is not active, obtain the filename by scanning for text at point enclosed in the delimiting characters.
       (let (P1 P2 DELIMCHARS)
-        (setq DELIMCHARS "^[][{}():\"'„“”][:space:]")
+        (setq DELIMCHARS (concat "^" my-find-region-or-at-point-delim-chars))
         (save-excursion (skip-chars-backward DELIMCHARS (line-beginning-position))
 		    (setq P1 (point)))
         (save-excursion (skip-chars-forward DELIMCHARS (line-end-position))
