@@ -4,7 +4,7 @@
 
 (global-set-key (kbd "C-e") 'my-move-end-of-line)
 
-(global-set-key (kbd "C-<tab>") 'my-other-window)
+(global-set-key (kbd "C-<") 'my-other-window)
 
 (global-set-key (kbd "C-x C-y") 'my-recenter)
 

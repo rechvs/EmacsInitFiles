@@ -26,4 +26,6 @@
 
 (add-hook 'org-mode-hook 'my-Org-mode-bindings)
 
+(add-hook 'vc-dir-mode-hook 'hl-line-mode)
+
 (add-hook 'view-mode-hook 'my-customize-interface)

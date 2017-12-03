@@ -1,25 +1,18 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; More or less self documenting settings ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Enable certain commands which are disabled by default. See Emacs info "Disabling".
 
+(put 'dired-find-alternate-file 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'save-buffers-kill-terminal 'disabled t)
+(put 'scroll-left 'disabled nil)
+(put 'set-goal-column 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
-(put 'narrow-to-region 'disabled nil)
-
-(put 'downcase-region 'disabled nil)
-
-(put 'save-buffers-kill-terminal 'disabled t)
-
-(put 'narrow-to-page 'disabled nil)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Settings requiring documentation ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; add `/usr/local/texlive/2015/bin/i386-linux´ to `PATH´ so AUCTeX finds it (http://tex.stackexchange.com/questions/24510/pdflatex-fails-within-emacs-app-but-works-in-terminal):
+;; add `/usr/local/texlive/2017/bin/i386-linux´ to `PATH´ so AUCTeX finds it (http://tex.stackexchange.com/questions/24510/pdflatex-fails-within-emacs-app-but-works-in-terminal):
 (setenv "PATH"
         (concat
-         "/usr/local/texlive/2015/bin/i386-linux"
+         "/usr/local/texlive/2017/bin/i386-linux"
          ":"
 
          (getenv "PATH")))
