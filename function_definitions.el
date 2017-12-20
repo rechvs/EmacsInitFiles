@@ -372,7 +372,7 @@ ignored."
         ;; Increment "index".
         (setq index (+ index 1)))
       ;; Offer a selection of buffer names based on "R-buffer-names-list" and switch to selected buffer.
-      (switch-to-buffer (ido-completing-read "Select R buffer: " R-buffer-names-list nil t))
+      (switch-to-buffer (ido-completing-read "Select R process buffer: " R-buffer-names-list nil t))
       ;; Clear echo area.
       (message nil)
       )))
