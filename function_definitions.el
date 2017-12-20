@@ -348,14 +348,34 @@ ignored."
     (_ (funcall origfun kind token))))
 (advice-add 'sh-smie-sh-rules :around #'my-sh-smie-sh-rules)
 
-(defun my-start-or-switch-to-r-process ()
-  "If an `R´ process is running, switch to the corresponding buffer. If not, switch to buffer `*R*´ and start an `R´ process using (`ess-request-a-process' nil t nil)."
+(defun my-start-or-switch-to-R-process ()
+  "If no R process is running, call (R). Otherwise, offer a selection of R process buffers and switch to the selected buffer."
   (interactive)
-  (if (get-process "R")
-      (switch-to-buffer "*R*")
-    (progn
-      (switch-to-buffer "*R*")
-      (R))))
+  (require 'ido)
+  (require 'ess)
+  (let (process-names-list R-buffer-names-list (index 0) cur-process-name)
+    ;; If a process named "R" does NOT exist,...
+    (if (not (get-process "R"))
+        ;; ...call "R",...
+        (R)
+      ;; ...else, do the following.
+      ;; Convert list of processes to a list of process names as strings and store it in "process-names-list.
+      (setq process-names-list (split-string (prin1-to-string (process-list)) "[ ]" t "(\\{,1\\}#<process\\|>)\\{,1\\}"))
+      ;; Loop over all elements in "process-names-list".
+      (while (<= index (- (length process-names-list) 1))
+        ;; Store current element of "process-names-list" in "cur-process-name".
+        (setq cur-process-name (nth index process-names-list))
+        ;; If "cur-process-name" matches the regexp "R[:]?[0-9]*",...
+        (if (string-match "^R[:]?[0-9]*$" cur-process-name)
+	  ;; ...append the name of the corresponding buffer to "R-buffer-names-list".
+	  (setq R-buffer-names-list (cons (buffer-name (process-buffer (get-process cur-process-name))) R-buffer-names-list)))
+        ;; Increment "index".
+        (setq index (+ index 1)))
+      ;; Offer a selection of buffer names based on "R-buffer-names-list" and switch to selected buffer.
+      (switch-to-buffer (ido-completing-read "Select R buffer: " R-buffer-names-list nil t))
+      ;; Clear echo area.
+      (message nil)
+      )))
 
 (defun my-string-match-list (LIST STRING)
   "Match string STRING against the elements of list LIST (using `string-match'). Return t upon finding the first match, otherwise return nil."
