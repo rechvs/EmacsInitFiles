@@ -359,7 +359,7 @@ ignored."
         ;; ...call "R",...
         (R)
       ;; ...else, do the following.
-      ;; Convert list of processes to a list of process names as strings and store it in "process-names-list.
+      ;; Convert list of currently running sub-processes to a list of process names as strings and store it in "process-names-list.
       (setq process-names-list (split-string (prin1-to-string (process-list)) "[ ]" t "(\\{,1\\}#<process\\|>)\\{,1\\}"))
       ;; Loop over all elements in "process-names-list".
       (while (<= index (- (length process-names-list) 1))
