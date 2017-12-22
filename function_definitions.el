@@ -349,7 +349,7 @@ ignored."
 (advice-add 'sh-smie-sh-rules :around #'my-sh-smie-sh-rules)
 
 (defun my-start-or-switch-to-R-process ()
-  "If no R process is running, call (R). Otherwise, offer a selection of R process buffers and switch to the selected buffer."
+  "If no R process is running, call (R). If exactly one R process is running, switch to the corresponding process buffer. Otherwise, offer a selection of R process buffers and switch to the selected buffer."
   (interactive)
   (require 'ido)
   (require 'ess)
@@ -371,8 +371,12 @@ ignored."
 	  (setq R-buffer-names-list (cons (buffer-name (process-buffer (get-process cur-process-name))) R-buffer-names-list)))
         ;; Increment "index".
         (setq index (+ index 1)))
-      ;; Offer a selection of buffer names based on "R-buffer-names-list" and switch to selected buffer.
-      (switch-to-buffer (ido-completing-read "Select R process buffer: " R-buffer-names-list nil t))
+      ;; If "R-buffer-names-list" has exactly 1 element,...
+      (if (= 1 (length R-buffer-names-list))
+	;; ...immediatly switch to the buffer listed in it.
+	(switch-to-buffer (nth 0 R-buffer-names-list))
+        ;; Else, offer a selection of buffer names based on "R-buffer-names-list" and switch to selected buffer.
+        (switch-to-buffer (ido-completing-read "Select R process buffer: " R-buffer-names-list nil t)))
       ;; Clear echo area.
       (message nil)
       )))
