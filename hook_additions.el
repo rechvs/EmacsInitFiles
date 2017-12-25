@@ -14,6 +14,9 @@
 
 (add-hook 'ess-mode-hook 'my-ESS_S_-mode-bindings)
 
+(add-hook 'gnus-group-mode-hook 'hl-line-mode)
+(add-hook 'gnus-summary-mode-hook 'hl-line-mode)
+
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-bindings)
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-symbol-additions)
 (add-hook 'LaTeX-mode-hook 'my-visual-line-mode-on)
