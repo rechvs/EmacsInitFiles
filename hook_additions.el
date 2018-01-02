@@ -30,8 +30,10 @@
 
 (add-hook 'org-mode-hook 'my-Org-mode-bindings)
 
+(add-hook 'sh-mode-hook 'my-Shell-script-mode-bindings)
+
 (add-hook 'shell-mode-hook '(lambda ()
-			(setq comint-scroll-show-maximum-output nil)  ;; Deactivate fancy scrolling.
+			(setq comint-scroll-show-maximum-output nil)  ;; Deactivate fancy scrolling due to interpreter output.
 			(setq scroll-conservatively 101)  ;; Deactivate automatic scrolling if point moves outside the window.
 			))
 

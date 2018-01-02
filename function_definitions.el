@@ -564,3 +564,9 @@ RET        org-return-indent
 C-j        org-return"
   (local-set-key "\r" 'org-return-indent)
   (local-set-key "\C-j" 'org-return))
+
+(defun my-Shell-script-mode-bindings ()
+  "This function contains custom key bindings intended for use in Shell-script mode.
+The bindings are:
+C-c C-u    my-comment-or-uncomment"
+  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
