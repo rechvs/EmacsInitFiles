@@ -462,7 +462,7 @@ ignored."
 	(setq gitigbuf (find-file-noselect gitigflnmexp))
 	;; Make "gitigbuf" the current buffer.
 	(set-buffer gitigbuf)
-	(beginning-of-buffer)
+	(goto-char (point-min))
 	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
 	(if (search-forward-regexp (concat "^" flnm "$") nil t)
 	    (throw 'inner (message "Filename %s is already present in %s’s blacklist." flnm gitigflnm)))
@@ -481,7 +481,7 @@ ignored."
 	(if (not (string-equal "#" (substring cmmnt 0 1)))
 	    (setq cmmnt (concat "# " cmmnt)))
 	;; If necessary, append a newline to "gitigbuf" (before appending the comment).
-	(end-of-buffer)
+	(goto-char (point-max))
 	(beginning-of-line)
 	(if (= (point) (point-max))
 	    (insert "\n")
