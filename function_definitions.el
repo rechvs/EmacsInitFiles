@@ -6,43 +6,42 @@
   "Turn abbrev mode ON."
   (abbrev-mode 1))
 
-(defun my-comment-or-uncomment (ARG1 ARG2)
+(defun my-comment-or-uncomment ()
   "When region is not active, comment the current line if uncommented, otherwise uncomment it. When region is active, comment uncommented lines and uncomment commented lines that are at least partly contained in region. Lines consisting only of a newline character or of whitespace and a newline character are skipped."
-  (interactive "r")
-  (let (ARG_DUMMY (CURRENT_LINE_NUMBER 1) LINE_BEG_FIRST_LINE LINE_BEG LINE_END)
-    (if mark-active
-        (progn
-	(if (> ARG1 ARG2)
-	    (setq ARG_DUMMY ARG2 ARG2 ARG1 ARG1 ARG_DUMMY))
-	(setq NUMBER_OF_LINES (count-lines ARG1 ARG2))
-	(save-excursion
-	  (goto-char ARG1)
-	  (move-beginning-of-line nil)
-	  (setq LINE_BEG_FIRST_LINE (point))
-	  (while (not (> CURRENT_LINE_NUMBER NUMBER_OF_LINES))
-	    (goto-char LINE_BEG_FIRST_LINE)
-	    (forward-line (- CURRENT_LINE_NUMBER 1))
-	    (move-end-of-line nil)
-	    (setq LINE_END (point))
-	    (move-beginning-of-line nil)
-	    (setq LINE_BEG (point))
-	    (skip-syntax-forward " " LINE_END)
-	    (if (and (not (= LINE_BEG LINE_END)) (not (= LINE_END (point))))
-	        (if (equal (string (char-after)) comment-start)
-		  (uncomment-region LINE_BEG LINE_END)
-		(comment-region LINE_BEG LINE_END)))
-	    (setq CURRENT_LINE_NUMBER (+ CURRENT_LINE_NUMBER 1)))))
-      (progn
+  (interactive)
+  ;; Define a function for commenting or uncommenting the text between 2 positions.
+  (cl-flet ((my-comment-or-uncomment-current-line
+	   (current-line-beginning current-line-end)
+	   (if (and (not (= current-line-beginning current-line-end)) (not (= current-line-end (point))))
+	       (if (equal (string (char-after)) comment-start)
+		 (uncomment-region current-line-beginning current-line-end)
+	         (comment-region current-line-beginning current-line-end)))))
+    (let (line-beginning line-end)
+      ;; If the mark is active,...
+      (if mark-active
+	(let ((current-line-number 1) first-line-beginning number-of-lines)
+	  ;; ...count the lines in the region,...
+	  (setq number-of-lines (count-lines (region-beginning) (region-end)))
+	  (save-excursion
+	    (goto-char (region-beginning))
+	    (setq first-line-beginning (line-beginning-position))
+	    ;; ...and successively comment or uncomment all lines in region using the previously defined function.
+	    (while (not (> current-line-number number-of-lines))
+	      (goto-char first-line-beginning)
+	      (forward-line (- current-line-number 1))
+	      (setq line-end (line-end-position))
+	      (setq line-beginning (line-beginning-position))
+	      (goto-char line-beginning)
+	      (skip-syntax-forward " " line-end)
+	      (my-comment-or-uncomment-current-line line-beginning line-end)
+	      (setq current-line-number (+ current-line-number 1)))))
+        ;; If the mark is not active, comment or uncomment the current line using the previously defined function.
         (save-excursion
-	(move-end-of-line nil)
-	(setq LINE_END (point))
-	(move-beginning-of-line nil)
-	(setq LINE_BEG (point))
-	(skip-syntax-forward " " LINE_END)
-	(if (and (not (= LINE_BEG LINE_END)) (not (= LINE_END (point))))
-	    (if (equal (string (char-after)) comment-start)
-	        (uncomment-region LINE_BEG LINE_END)
-	      (comment-region LINE_BEG LINE_END))))))))
+	(setq line-end (line-end-position))
+	(setq line-beginning (line-beginning-position))
+	(goto-char line-beginning)
+	(skip-syntax-forward " " line-end)
+	(my-comment-or-uncomment-current-line line-beginning line-end))))))
 
 (defun my-customize-interface ()
   "Change interface features in the following way:
