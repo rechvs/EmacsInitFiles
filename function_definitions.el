@@ -148,7 +148,6 @@ ignored."
     (if (region-active-p)
         (progn
 	(setq FILENAME (buffer-substring-no-properties (region-beginning) (region-end)))
-	;; (deactivate-mark t)
 	)
       ;; If the region is not active, obtain the filename by scanning for text at point enclosed in the delimiting characters.
       (let (P1 P2 DELIMCHARS)
@@ -161,9 +160,14 @@ ignored."
     ;; If FILENAME is empty, message the user about it, but do not visit it.
     (if (string= "" FILENAME)
         (message "Empty filename ignored.")
-      ;; If it exists, visit FILENAME.
+      ;; If FILENAME exists...
       (if (file-exists-p FILENAME)
-	(find-file FILENAME)
+	(progn
+	  ;; ...and if the region is active, deactivate the mark...
+	  (if (region-active-p)
+	      (deactivate-mark t))
+	  ;; ...and visit FILENAME.
+	  (find-file FILENAME))
         ;; If FILENAME does not exist, message the user about it.
         ;; In order to distinguish FILENAME from the rest of the message, we can use either quotation marks...
         ;; (message "File \"%s\" does not exist." FILENAME)))))
