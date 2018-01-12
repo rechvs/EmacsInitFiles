@@ -122,19 +122,6 @@ If point is not on a blank line do nothing."
  (forward-line (- (/ ARG 2) 1))))))
       (message "Current line is not blank\."))))
 
-;(defun my-glossary-entry (name)
-;  "Insert \paragraph and \label using the input string."
-;  (interactive "sName des Eintrags: ")
-;  (insert (format "\\paragraph{%s}
-;\\label{%s}\n
-;" name name)
-;          )
-;  )
-;
-;(defun my-bind-glossary-entry ()
-;  "Bind my-glossary-entry to C-c C-a."
-;  (local-set-key "\C-c\C-a" 'my-glossary-entry))
-
 (defun my-find-region-or-at-point ()
   "If region is active, use text in region as the filename to visit.
 Otherwise use the text at point as the filename to visit. The
