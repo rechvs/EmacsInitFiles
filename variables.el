@@ -1,5 +1,4 @@
 ;; Enable certain commands which are disabled by default. See Emacs info "Disabling".
-
 (put 'dired-find-alternate-file 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-page 'disabled nil)
