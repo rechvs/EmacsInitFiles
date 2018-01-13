@@ -17,7 +17,7 @@
 (add-hook 'gnus-group-mode-hook 'hl-line-mode)
 (add-hook 'gnus-summary-mode-hook 'hl-line-mode)
 
-(add-hook 'LaTeX-mode-hook '(lambda () (setq TeX-command-default "LatexMake")))  ;; The string must correspond to a handle in variable "TeX-command-list".
+(add-hook 'LaTeX-mode-hook '(lambda () (setq TeX-command-default "LatexMake")))	; The string must correspond to a handle in variable "TeX-command-list".
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-bindings)
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-symbol-additions)
 (add-hook 'LaTeX-mode-hook 'my-visual-line-mode-on)
@@ -33,8 +33,8 @@
 (add-hook 'sh-mode-hook 'my-Shell-script-mode-bindings)
 
 (add-hook 'shell-mode-hook '(lambda ()
-			(setq comint-scroll-show-maximum-output nil)  ;; Deactivate fancy scrolling due to interpreter output.
-			(setq scroll-conservatively 101)  ;; Deactivate automatic scrolling if point moves outside the window.
+			(setq comint-scroll-show-maximum-output nil) ; Deactivate fancy scrolling due to interpreter output.
+			(setq scroll-conservatively 101) ; Deactivate automatic scrolling if point moves outside the window.
 			))
 
 (add-hook 'vc-dir-mode-hook 'hl-line-mode)
