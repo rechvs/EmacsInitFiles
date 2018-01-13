@@ -12,7 +12,7 @@
 
 (global-set-key (kbd "M-ä") 'my-switch-windows)
 
-;; Org mode
+;; Org mode key bindings.
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
