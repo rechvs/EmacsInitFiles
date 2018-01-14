@@ -512,8 +512,10 @@ C-c C-u    my-comment-or-uncomment"
 (defun my-ESS_S_-mode-bindings ()
   "This function contains custom key bindings intended for use in ESS[S] mode.
 The bindings are:
-C-c C-u    my-comment-or-uncomment"
-  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
+C-c C-u    my-comment-or-uncomment
+C-c C-p    ess-eval-paragraph"
+  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
+  (local-set-key "\C-c\C-p" 'ess-eval-paragraph))
 
 (defun my-LaTeX/P-mode-bindings ()
   "This function contains custom key bindings intended for use in LaTeX/P mode.
