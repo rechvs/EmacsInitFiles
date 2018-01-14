@@ -22,14 +22,13 @@
 ;; define a customizable variable `my-files-to-visit-at-startup´:
 (defcustom my-files-to-visit-at-startup
   '("/home/renke/Privat/Privat.org")
-  "A variable containing the paths to files which ought to be visited at startup."
+  "A list of paths to files which ought to be visited at startup."
   :type '(repeat file))
 
-;; define a customizable variable `my-immediately-switch-to-buffer-excluded-buffers´:
-(defcustom my-immediately-switch-to-buffer-excluded-buffers
-  '("\\*Minibuf-+[0-9]*[0-9]\\*")
-  "A list containing buffer names as regular expressions which should not be switched to by `my-immediately-switch-to-buffer'."
-  :type '(repeat regexp))
+;; Define a non-customizable variable "my-Emacs-issue-index" which holds the index of the next Emacs issue as an integer.
+(defvar my-Emacs-issue-index
+  200
+  "The index of the next private Emacs issue.")
 
 ;; Define a customizable variable "my-find-region-or-at-point-delim-chars" which is used as the regexp of delimiting characters by "my-find-region-or-at-point".
 (defcustom my-find-region-or-at-point-delim-chars
@@ -56,3 +55,9 @@
 (defvar my-immediately-switch-to-buffer-counter
   0
   "Number of buffers in `buffer-list' to skip by `my-immediately-switch-to-buffer'.") 
+
+;; define a customizable variable `my-immediately-switch-to-buffer-excluded-buffers´:
+(defcustom my-immediately-switch-to-buffer-excluded-buffers
+  '("\\*Minibuf-+[0-9]*[0-9]\\*")
+  "A list containing buffer names as regular expressions which should not be switched to by `my-immediately-switch-to-buffer'."
+  :type '(repeat regexp))
