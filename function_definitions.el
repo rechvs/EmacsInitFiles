@@ -447,6 +447,9 @@ ignored."
 	  (throw 'outer (message "File %s is not readable." gitigflnm)))
         (if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
 	  (throw 'outer (message "File %s is not writable." gitigflnm)))
+        ;; Remove either "~/" or the expansion of "~/" from the beginning of "flnm" and "flnmexp".
+        (setq flnm (replace-regexp-in-string (concat "\\(^~/\\)\\|\\(^" (expand-file-name "~/") "\\)") "" flnm))
+        (setq flnmexp (replace-regexp-in-string (concat "\\(^~/\\)\\|\\(^" (expand-file-name "~/") "\\)") "" flnmexp))
         ;; Visit "gitigflnmexp" and store the resulting buffer in "gitigbuf".
         (save-excursion
 	(setq gitigbuf (find-file-noselect gitigflnmexp))
