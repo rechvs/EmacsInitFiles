@@ -164,7 +164,7 @@ ignored."
 
 (defun my-follow-bookmark (BKMK)
   "Call (`delete-other-windows'), open bookmark BKMK in two vertically separated windows and activate follow-mode."
-  (interactive
+  (interactive)
    (list
     (let (BKMKS)
       (bookmark-load "~/.emacs.d/bookmarks" t)
@@ -173,7 +173,24 @@ ignored."
       (bookmark-jump BKMK)
    (delete-other-windows)
    (split-window-horizontally)
-   (follow-mode t)))))
+   (follow-mode t))))
+
+(defun gnus-user-format-function-a (hdr)
+  "If HDR is not a vector, return the string \"void\". Otherwise, if the value of the To: header is one of my email addresses, return the From: header, else return the To: header. In both cases, prefer the full name of sender/recipient if present, otherwise use only the email address. See `gnus-summary-line-format' on how this function interfaces with Gnus."
+  (if (not (vectorp hdr))
+      "void"
+    (let ((from (mail-extract-address-components (mail-header-from hdr)))
+	(to (cdr (assoc 'To (mail-header-extra hdr)))))
+      (setq from (if (null (nth 0 from))
+		 (nth 1 from)
+	         (nth 0 from)))
+      (if (string-match "[[:alnum:][:punct:] ]*\\(magic_willebinski\\)\\|\\(renke.vonseggern\\)@gmx\\.de" to)
+	from
+        (setq to (mail-extract-address-components to))
+        (setq to (if (null (nth 0 to))
+		 (nth 1 to)
+	         (nth 0 to)))
+        to))))
 
 (defun my-hiwi-ssh-bayeos ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
@@ -330,6 +347,12 @@ ignored."
   "Call (`revert-buffer' nil t nil)."
   (interactive)
   (revert-buffer nil t nil))
+
+(defun my-select-gnus-message-archive-group (sgrp)
+  "Function for returning the name of the Gnus group in which to archive outgoing messages, based on the name of the group from which the message was sent. See `gnus-message-archive-group' for details."
+  (if (string-match-p "^Bewerbung.*" sgrp)
+      "Bewerbung.Ausgang"
+    "Privat.Ausgang"))
 
 (defun my-sh-smie-sh-rules (origfun kind token)
   "Custom function to correct indentation in shell scripts after `&&´. Taken from `http://superuser.com/questions/1037043/emacs-suppress-indent-after-in-shell-script-mode´."
