@@ -184,7 +184,8 @@ ignored."
       (setq from (if (null (nth 0 from))
 		 (nth 1 from)
 	         (nth 0 from)))
-      (if (string-match "[[:alnum:][:punct:] ]*\\(magic_willebinski\\)\\|\\(renke.vonseggern\\)@gmx\\.de" to)
+      (if (or (null to)
+	    (string-match "[[:alnum:][:punct:] ]*\\(magic_willebinski\\)\\|\\(renke.vonseggern\\)@gmx\\.de" to))
 	from
         (setq to (mail-extract-address-components to))
         (setq to (if (null (nth 0 to))
