@@ -6,6 +6,13 @@
   "Turn abbrev mode ON."
   (abbrev-mode 1))
 
+(defun my-back-to-indentation ()
+  "Move point to the first character on current line, which is not mentioned in `my-back-to-indentation-skip-chars'."
+  (interactive "^")
+  (beginning-of-line 1)
+  (skip-chars-forward my-back-to-indentation-skip-chars (line-end-position))
+  (backward-prefix-chars))
+
 (defun my-comment-or-uncomment ()
   "When region is not active, comment the current line if uncommented, otherwise uncomment it. When region is active, comment uncommented lines and uncomment commented lines that are at least partly contained in region. Lines consisting only of a newline character or of whitespace and a newline character are skipped."
   (interactive)

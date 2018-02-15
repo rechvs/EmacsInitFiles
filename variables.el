@@ -19,6 +19,12 @@
 
          (getenv "PATH")))
 
+(defcustom my-back-to-indentation-skip-chars
+  " "
+  "Regexp-like string containing the characters at the beginning of a line to be skipped by `my-back-to-indentation'. See `skip-chars-forward' for the string syntax."
+  :type '(string))
+(make-variable-buffer-local 'my-back-to-indentation-skip-chars)
+
 ;; define a customizable variable `my-files-to-visit-at-startup´:
 (defcustom my-files-to-visit-at-startup
   '("/home/renke/Privat/Privat.org")

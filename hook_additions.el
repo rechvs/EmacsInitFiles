@@ -7,6 +7,11 @@
 
 (add-hook 'Buffer-menu-mode-hook 'hl-line-mode)
 
+(add-hook 'diff-mode-hook
+	(lambda ()
+	  (setq my-back-to-indentation-skip-chars "	 +-")
+	  (local-set-key "\M-m" 'my-back-to-indentation)))
+
 (add-hook 'dired-mode-hook 'hl-line-mode)
 (add-hook 'dired-mode-hook 'my-customize-interface)
 
