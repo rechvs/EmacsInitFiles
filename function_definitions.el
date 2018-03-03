@@ -214,6 +214,7 @@ ignored."
   "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'."
   (interactive)
   (let (WINDOW-LIST (WINDOW_NR 0) (BUFFER-NAME-LIST (list "")) (BUFFER_NR 0) (BUFFER_NEXT_IN_ROW ""))
+    (catch 'CATCH
     ;; If we are in the minibuffer, inform about this and do nothing else.
     (if (string-match "\ \*Minibuf-+[0-9]*[0-9]\*" (buffer-name (current-buffer)))
         (display-message-or-buffer "Currently in minibuffer.")
@@ -244,10 +245,15 @@ ignored."
 	         (my-string-match-list my-immediately-switch-to-buffer-excluded-buffers BUFFER_NEXT_IN_ROW))
 	;; ...step variable "my-immediately-switch-to-buffer-counter"...
 	(setq my-immediately-switch-to-buffer-counter (+ 1 my-immediately-switch-to-buffer-counter))
+	;; If "my-immediately-switch-to-buffer-counter" is a larger numer than the length of the list returned by "buffer-list", inform about it and exit.
+	(if (> my-immediately-switch-to-buffer-counter (length (buffer-list)))
+	    (progn
+	      (display-message-or-buffer "No more buffers left to switch to.")
+	      (throw 'CATCH t)))
 	;; ...and set "BUFFER_NEXT_IN_ROW" to the buffer name at position "my-immediately-switch-to-buffer-counter" in the list given by "buffer-list".
 	(setq BUFFER_NEXT_IN_ROW (buffer-name (nth my-immediately-switch-to-buffer-counter (buffer-list)))))
         ;; Switch to buffer "BUFFER_NEXT_IN_ROW".
-        (switch-to-buffer BUFFER_NEXT_IN_ROW)))))
+        (switch-to-buffer BUFFER_NEXT_IN_ROW))))))
 
 (defun my-load-bookmarks-on-startup ()
   "Uses the function bookmark-load."
