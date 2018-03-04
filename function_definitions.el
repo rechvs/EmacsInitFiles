@@ -20,7 +20,7 @@
   (cl-flet ((my-comment-or-uncomment-current-line
 	   (current-line-beginning current-line-end)
 	   (if (and (not (= current-line-beginning current-line-end)) (not (= current-line-end (point))))
-	       (if (equal (string (char-after)) comment-start)
+	       (if (equal (buffer-substring (point) (+ (point) (length comment-start))) comment-start)
 		 (uncomment-region current-line-beginning current-line-end)
 	         (comment-region current-line-beginning current-line-end)))))
     (let (line-beginning line-end)
