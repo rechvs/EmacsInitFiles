@@ -33,6 +33,8 @@
 
 (add-hook 'octave-mode-hook 'my-Octave-mode-bindings)
 
+(add-hook 'python-mode-hook 'my-Python-mode-bindings)
+
 (add-hook 'org-mode-hook 'my-Org-mode-bindings)
 
 (add-hook 'sh-mode-hook 'my-Shell-script-mode-bindings)
