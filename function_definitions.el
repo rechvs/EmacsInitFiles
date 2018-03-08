@@ -248,7 +248,7 @@ ignored."
 	;; If "my-immediately-switch-to-buffer-counter" is a larger numer than the length of the list returned by "buffer-list", inform about it and exit.
 	(if (> my-immediately-switch-to-buffer-counter (length (buffer-list)))
 	    (progn
-	      (display-message-or-buffer "No more buffers left to switch to.")
+	      (error "No more buffers left to switch to")
 	      (throw 'CATCH t)))
 	;; ...and set "BUFFER_NEXT_IN_ROW" to the buffer name at position "my-immediately-switch-to-buffer-counter" in the list given by "buffer-list".
 	(setq BUFFER_NEXT_IN_ROW (buffer-name (nth my-immediately-switch-to-buffer-counter (buffer-list)))))
@@ -596,6 +596,12 @@ RET        org-return-indent
 C-j        org-return"
   (local-set-key "\r" 'org-return-indent)
   (local-set-key "\C-j" 'org-return))
+
+(defun my-Python-mode-bindings ()
+  "This function contains custom key bindings intended for use in Python mode.
+The bindings are:
+C-c C-u    my-comment-or-uncomment"
+  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Shell-script-mode-bindings ()
   "This function contains custom key bindings intended for use in Shell-script mode.
