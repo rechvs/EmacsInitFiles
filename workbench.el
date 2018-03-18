@@ -157,7 +157,7 @@
 			         ))
 			     list1)))
   ;; Create a proper regexp to cover all section numbers based on "list2".
-  (while (< cntr (length list2))
+  (while (<= cntr (length list2))
     (setq format-string (concat format-string "\\(%s\\)\\|"))
     (setq cntr (1+ cntr)))
   (setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
@@ -165,10 +165,8 @@
   ;; Store program names only in "list3".
   (setq list3 (mapcar (lambda
 		    (prog-name-plus-sec-num)
-		    (substring prog-name-plus-sec-num 0 (string-match "([1-8ln]" prog-name-plus-sec-num)))
-		    ;; (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
+		    (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
 		  list1))
-  (setq list3-old list3) nil)				;TESTING
   ;; Store names of programs with man pages in multiple sections in "list4".
   (setq list4 (delq nil (delete-dups (mapcar (lambda
 				       (prog-name-only)
