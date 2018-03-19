@@ -42,7 +42,7 @@
 				       ))
 				   list1)))
 	;; Create a proper regexp to cover all section numbers based on "list2".
-	(while (< cntr (length list2))
+	(while (<= cntr (length list2))
 	  (setq format-string (concat format-string "\\(%s\\)\\|"))
 	  (setq cntr (1+ cntr)))
 	(setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
@@ -50,7 +50,6 @@
 	;; Store program names only in "list3".
 	(setq list3 (mapcar (lambda
 			  (prog-name-plus-sec-num)
-			  ;; (substring prog-name-plus-sec-num 0 (string-match "([1-8ln]" prog-name-plus-sec-num)))
 			  (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
 			list1))
 	;; Store names of programs with man pages in multiple sections in "list4".
@@ -128,57 +127,6 @@
         ;; ...or text color.
         (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
         (error "Program name %s unknown to man" prog-name)))))
-
-(let
-    (
-     prog-name
-     (prog-name-and-sec-num "intro")
-     ;; (prog-name-and-sec-num "6 intro")
-     ;; (prog-name-and-sec-num "intro.6")
-     ;; (prog-name-and-sec-num "intro(6)")
-     ;; (prog-name-and-sec-num "intro (6)")
-     ;; (prog-name-and-sec-num "2to3-2.7 (1)")
-     ;; (prog-name-and-sec-num "1 2to3-2.7")
-     sec-num-before
-     sec-num-after
-     (cntr 1)
-     (format-string "")
-     sec-nums-regexp
-     )
-  ;; Store the list of all program names and corresponding section numbers known to man in "list1".
-  (setq string1 (shell-command-to-string "apropos -l ."))
-  (setq string1 (replace-regexp-in-string " (" "(" (replace-regexp-in-string ",$" "" (replace-regexp-in-string " +- .*\n" "," string1))))
-  (setq list1 (split-string string1 ","))
-  ;; Store all section numbers known to man in "list2".
-  (setq list2 (delete-dups (mapcar (lambda
-			       (prog-name-plus-sec-num)
-			       (if (string-match "(\\(.*\\))$" prog-name-plus-sec-num)
-				 (substring prog-name-plus-sec-num (match-beginning 1) (match-end 1))
-			         ))
-			     list1)))
-  ;; Create a proper regexp to cover all section numbers based on "list2".
-  (while (<= cntr (length list2))
-    (setq format-string (concat format-string "\\(%s\\)\\|"))
-    (setq cntr (1+ cntr)))
-  (setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
-  (setq sec-nums-regexp (apply 'format format-string list2))
-  ;; Store program names only in "list3".
-  (setq list3 (mapcar (lambda
-		    (prog-name-plus-sec-num)
-		    (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
-		  list1))
-  ;; Store names of programs with man pages in multiple sections in "list4".
-  (setq list4 (delq nil (delete-dups (mapcar (lambda
-				       (prog-name-only)
-				       (if (> (count prog-name-only list3 :test 'equal) 1)
-					 prog-name-only))
-				     list3))))
-  ;; Add "list4" to "list1".
-  (nconc list1 list4)
-  ;; Set Emacs variables.
-  (setq my-man-known-programs-only (delete-dups list3))
-  (setq my-man-known-programs-plus-sections list1)
-  (setq my-man-known-sections-only list2))
 
 ;; (let (string1 list1 list2 list3 list4)
 (progn
