@@ -68,14 +68,14 @@
     (if (region-active-p)
         (progn
 	(setq prog-name-and-sec-num (buffer-substring-no-properties (region-beginning) (region-end)))
-	;; Check whether the section number is mentioned at the before the program name. Extract the program name if applicable.
+	;; Check whether the section number is mentioned before the program name. If so, extract the program name.
 	(setq sec-num-before (string-match (concat "^" sec-nums-regexp " ") prog-name-and-sec-num))
 	(if sec-num-before
 	    (progn
 	      (setq sec-num-before (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
 	      (setq prog-name (substring prog-name-and-sec-num (match-end 0)))
 	      ))
-	;; Check whether the section number is mentioned after the program name. Extract the program name if applicable.
+	;; Check whether the section number is mentioned after the program name. If so, extract the program name.
 	(setq sec-num-after (string-match (concat " ?[.(]?" sec-nums-regexp ")?$") prog-name-and-sec-num))
 	(if (and sec-num-after (not sec-num-before)) ;We also check that "sec-num-before" is unset because that should be preferred over "sec-num-after".
 	    (progn
@@ -99,17 +99,15 @@
       (let (p1 p2 (delim-chars "[a-z0-9:._-]"))
         (save-excursion (skip-chars-backward delim-chars (point-min))
 		    (setq p1 (point))
-		    ;; (if (looking-back "[\n[:space:]]+\\([1-8ln]\\|\\(3am\\)\\|\\(3perl\\)\\|\\(3pm\\)\\|\\(3posix\\)\\) " (- p1 8))
-		    (if (looking-back "[\n[:space:]]+\\([1-8ln]\\|\\(3am\\)\\|\\(3perl\\)\\|\\(3pm\\)\\|\\(3posix\\)\\) " (- p1 8))
+		    (if (looking-back (concat "[\n[:space:]]+" sec-nums-regexp " " (- p1 (+ 2 (apply 'max (mapcar 'length list2))))))
 		        (setq sec-num (match-string 1))))
         (save-excursion (skip-chars-forward delim-chars (point-max))
 		    (setq p2 (point))
-		    ;; (if (looking-at "[.(]?\\([1-8ln]\\|\\(3am\\)\\|\\(3perl\\)\\|\\(3pm\\)\\|\\(3posix\\)\\)[\n[:space:][:punct:])]+")
-		    (if (looking-at "[.(]?\\([1-8ln]\\|\\(3am\\)\\|\\(3perl\\)\\|\\(3pm\\)\\|\\(3posix\\)\\)[\n[:space:][:punct:])]+")
+		    (if (looking-at (concat "[.(]?" sec-nums-regexp "[\n[:space:][:punct:])]+"))
 		        (setq sec-num (match-string 1))))
         (set-match-data match-data-old)
         (setq prog-name (buffer-substring-no-properties p1 p2))))
-    ;; If prog-name is empty, message the user about it, but do not visit it.
+    ;; If prog-name is empty, signal an error.
     (if (string= "" prog-name)
         (error "Empty program name ignored")
       ;; If a man page for "prog-name" exists...
@@ -128,102 +126,4 @@
         (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
         (error "Program name %s unknown to man" prog-name)))))
 
-;; (let (string1 list1 list2 list3 list4)
-(progn
-  (setq string1 (shell-command-to-string "apropos -l ."))
-  (setq string1 (replace-regexp-in-string " (" "(" (replace-regexp-in-string ",$" "" (replace-regexp-in-string " +- .*\n" "," string1))))
-  (setq list1 (split-string string1 ","))
-  (setq list2 (delete-dups (mapcar (lambda
-			       (prog-name-plus-sec-num)
-			       (if (string-match "(\\(.*\\))$" prog-name-plus-sec-num)
-				 (substring prog-name-plus-sec-num (match-beginning 1) (match-end 1))
-				 ))
-			     list1)))
-  ;; Create a proper regexp to cover all section numbers known to man.
-  (while (< cntr (length list2))
-    (setq format-string (concat format-string "\\(%s\\)\\|"))
-    (setq cntr (1+ cntr)))
-  (setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
-  (setq sec-nums-regexp (apply 'format format-string list2))
-  
-  (setq list3 (mapcar (lambda
-		    (prog-name-plus-sec-num)
-		    (substring prog-name-plus-sec-num 0 (string-match "([1-8ln]" prog-name-plus-sec-num)))
-		  list1))
-  (setq list4 (delq nil (delete-dups (mapcar (lambda
-				       (prog-name-only)
-				       (if (> (count prog-name-only list3 :test 'equal) 1)
-					 prog-name-only))
-				     list3))))
-  (nconc list1 list4)
-  nil
-  )
-
-(let (
-      prog-name
-      (prog-name-and-sec-num "intro")
-      ;; (prog-name-and-sec-num "6 intro")
-      ;; (prog-name-and-sec-num "intro.6")
-      ;; (prog-name-and-sec-num "intro(6)")
-      ;; (prog-name-and-sec-num "intro (6)")
-      ;; (prog-name-and-sec-num "2to3-2.7 (1)")
-      ;; (prog-name-and-sec-num "1 2to3-2.7")
-      sec-num-before
-      sec-num-after
-      (cntr 1)
-      (format-string "")
-      sec-nums-regexp
-      )
-  ;; Check whether the section number is mentioned at the before the program name.
-  (setq sec-num-before (string-match (concat "^" sec-nums-regexp " ") prog-name-and-sec-num))
-  (if sec-num-before
-      (progn
-        (setq sec-num-before (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
-        (setq prog-name (substring prog-name-and-sec-num (match-end 0)))
-        ))
-  ;; Check whether the section number is mentioned after the program name.
-  (setq sec-num-after (string-match (concat " ?[.(]?" sec-nums-regexp ")?$") prog-name-and-sec-num))
-  (if (and sec-num-after (not sec-num-before))
-      (progn
-        (setq sec-num-after (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
-        (setq prog-name (substring prog-name-and-sec-num 0 (match-beginning 0)))
-        ))
-  ;; Extract the actual section number from the check results.
-  (setq sec-num (catch 'here
-	        (mapc (lambda
-		      (element)
-		      (if element
-			(throw 'here element)
-		        ;; (throw 'here nil)
-		        ))
-		    (list sec-num-before sec-num-after))))
-  (setq sec-num (delq nil sec-num))	;This is required in order to allow using "sec-num" as a boolean value further down.
-  (if (not prog-name)
-      (setq prog-name prog-name-and-sec-num))
-  (display-message-or-buffer (concat prog-name "." (if sec-num sec-num "NA"))) ;TESTING
-  )
-
 (completing-read "Prompt: " list1)
-
-(let (list1 list2)
-  (with-temp-buffer
-    (shell-command "man -k ." (current-buffer) "*Messages*")
-    (goto-char (point-min))
-    (replace-regexp " +- .*\n" "," nil (point-min) (point-max))
-    (goto-char (point-min))
-    (replace-regexp ",$" "" nil (point-min) (point-max))
-    (goto-char (point-min))
-    (replace-string " (" "(" nil (point-min) (point-max))
-    (goto-char (point-min))
-    (setq list1 (split-string (buffer-substring-no-properties (point-min) (point-max)) ","))
-    (goto-char (point-min))
-    (setq list2 (delq nil (delete-dups (mapcar (lambda
-				         (prog-name-plus-sec-num)
-				         (let (prog-name-only)
-					 (setq prog-name-only (regexp-quote (substring prog-name-plus-sec-num 0 (string-match "([1-8ln]" prog-name-plus-sec-num))))
-					 (if (> (count-matches (concat "," prog-name-only "(") (point-min) (point-max)) 1)
-					     prog-name-only
-					   )))
-				       list1))))
-    (nconc list1 list2)
-    ))
