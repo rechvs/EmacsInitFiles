@@ -2,19 +2,24 @@
   nil
   "List of all programs (without sections) known to man.")
 
-(defvar my-man-known-programs-plus-sections
-  nil
-  "List of all programs (with sections) known to man.")
-
 (defvar my-man-known-sections-only
   nil
   "List of all sections (without programs) known to man.")
+
+(defvar my-man-known-sections-regexp
+  nil
+  "Regexp covering all sections known to man.")
+
+(defvar my-man-known-programs-plus-sections
+  nil
+  "List of all programs (with and without sections) known to man.")
 
 (defun my-man ()
   "If region is active, use text in region as the program name for which to display the man page. \"Program name\" here means the actual program name including the man page section number if present. Otherwise use the text at point as the program name. If it exists, visit the man page via `man'. An empty program name is ignored."
   (interactive)
   (let ((cntr 1)
         (format-string "")
+        initial-input
         list1
         list2
         list3
@@ -28,7 +33,7 @@
         sec-nums-regexp
         string1)
     ;; If not already available, create a list of all combinations of program names and section numbers known to "man".
-    (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only))
+    (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only) (not my-man-known-sections-regexp))
         (progn
 	;; Store the list of all program names and corresponding section numbers known to man in "list1".
 	(setq string1 (shell-command-to-string "apropos -l ."))
@@ -46,7 +51,7 @@
 	  (setq format-string (concat format-string "\\(%s\\)\\|"))
 	  (setq cntr (1+ cntr)))
 	(setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
-	(setq sec-nums-regexp (apply 'format format-string list2))
+	(setq sec-nums-regexp (apply 'format format-string (sort list2 'string<)))
 	;; Store program names only in "list3".
 	(setq list3 (mapcar (lambda
 			  (prog-name-plus-sec-num)
@@ -61,22 +66,23 @@
 	;; Add "list4" to "list1".
 	(nconc list1 list4)
 	;; Set Emacs variables.
-	(setq my-man-known-programs-only (delete-dups list3))
-	(setq my-man-known-programs-plus-sections list1)
-	(setq my-man-known-sections-only list2)))
+	(setq my-man-known-sections-regexp sec-nums-regexp)
+	(setq my-man-known-programs-plus-sections (sort list1 'string<))
+	(setq my-man-known-sections-only list2)
+	(setq my-man-known-programs-only (delete-dups list3))))
     ;; If the region is active, obtain program name and, if present, section number from it.
     (if (region-active-p)
         (progn
 	(setq prog-name-and-sec-num (buffer-substring-no-properties (region-beginning) (region-end)))
 	;; Check whether the section number is mentioned before the program name. If so, extract the program name.
-	(setq sec-num-before (string-match (concat "^" sec-nums-regexp " ") prog-name-and-sec-num))
+	(setq sec-num-before (string-match (concat "^" my-man-known-sections-regexp " ") prog-name-and-sec-num))
 	(if sec-num-before
 	    (progn
 	      (setq sec-num-before (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
 	      (setq prog-name (substring prog-name-and-sec-num (match-end 0)))
 	      ))
 	;; Check whether the section number is mentioned after the program name. If so, extract the program name.
-	(setq sec-num-after (string-match (concat " ?[.(]?" sec-nums-regexp ")?$") prog-name-and-sec-num))
+	(setq sec-num-after (string-match (concat " ?[.(]?" my-man-known-sections-regexp ")?$") prog-name-and-sec-num))
 	(if (and sec-num-after (not sec-num-before)) ;We also check that "sec-num-before" is unset because that should be preferred over "sec-num-after".
 	    (progn
 	      (setq sec-num-after (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
@@ -99,14 +105,21 @@
       (let (p1 p2 (delim-chars "[a-z0-9:._-]"))
         (save-excursion (skip-chars-backward delim-chars (point-min))
 		    (setq p1 (point))
-		    (if (looking-back (concat "[\n[:space:]]+" sec-nums-regexp " " (- p1 (+ 2 (apply 'max (mapcar 'length list2))))))
+		    (if (looking-back (concat "[\n[:space:]]+" my-man-known-sections-regexp " ") (- p1 (+ 2 (apply 'max (mapcar 'length my-man-known-sections-only)))))
 		        (setq sec-num (match-string 1))))
         (save-excursion (skip-chars-forward delim-chars (point-max))
 		    (setq p2 (point))
-		    (if (looking-at (concat "[.(]?" sec-nums-regexp "[\n[:space:][:punct:])]+"))
+		    (if (looking-at (concat " ?[.(]?" my-man-known-sections-regexp "[\n[:space:][:punct:])]+"))
 		        (setq sec-num (match-string 1))))
         (set-match-data match-data-old)
         (setq prog-name (buffer-substring-no-properties p1 p2))))
+    ;; BEGIN TESTING
+    (setq initial-input (if sec-num
+		        (concat prog-name "(" sec-num ")")
+		      prog-name))
+    (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm initial-input))intro (1)
+  ;; END TESTING
+    ;; CONTINUE HERE with properly prompting for user input
     ;; If prog-name is empty, signal an error.
     (if (string= "" prog-name)
         (error "Empty program name ignored")
@@ -126,4 +139,4 @@
         (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
         (error "Program name %s unknown to man" prog-name)))))
 
-(completing-read "Prompt: " list1)
+
