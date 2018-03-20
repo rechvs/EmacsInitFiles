@@ -51,7 +51,8 @@
 	  (setq format-string (concat format-string "\\(%s\\)\\|"))
 	  (setq cntr (1+ cntr)))
 	(setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
-	(setq sec-nums-regexp (apply 'format format-string (sort list2 'string<)))
+	(setq list2 (sort list2 'string<))
+	(setq sec-nums-regexp (apply 'format format-string list2))
 	;; Store program names only in "list3".
 	(setq list3 (mapcar (lambda
 			  (prog-name-plus-sec-num)
@@ -74,15 +75,15 @@
     (if (region-active-p)
         (progn
 	(setq prog-name-and-sec-num (buffer-substring-no-properties (region-beginning) (region-end)))
-	;; Check whether the section number is mentioned before the program name. If so, extract the program name.
+	;; Check whether the section number is mentioned before the program name. If so, extract it and the program name.
 	(setq sec-num-before (string-match (concat "^" my-man-known-sections-regexp " ") prog-name-and-sec-num))
 	(if sec-num-before
 	    (progn
 	      (setq sec-num-before (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
 	      (setq prog-name (substring prog-name-and-sec-num (match-end 0)))
 	      ))
-	;; Check whether the section number is mentioned after the program name. If so, extract the program name.
-	(setq sec-num-after (string-match (concat " ?[.(]?" my-man-known-sections-regexp ")?$") prog-name-and-sec-num))
+	;; Check whether the section number is mentioned after the program name. If so, extract it and the program name.
+	(setq sec-num-after (string-match (concat " ?[(]?" my-man-known-sections-regexp ")?$") prog-name-and-sec-num))
 	(if (and sec-num-after (not sec-num-before)) ;We also check that "sec-num-before" is unset because that should be preferred over "sec-num-after".
 	    (progn
 	      (setq sec-num-after (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
@@ -109,7 +110,7 @@
 		        (setq sec-num (match-string 1))))
         (save-excursion (skip-chars-forward delim-chars (point-max))
 		    (setq p2 (point))
-		    (if (looking-at (concat " ?[.(]?" my-man-known-sections-regexp "[\n[:space:][:punct:])]+"))
+		    (if (looking-at (concat " ?[(]?" my-man-known-sections-regexp "[\n[:space:][:punct:])]+"))
 		        (setq sec-num (match-string 1))))
         (set-match-data match-data-old)
         (setq prog-name (buffer-substring-no-properties p1 p2))))
@@ -117,7 +118,12 @@
     (setq initial-input (if sec-num
 		        (concat prog-name "(" sec-num ")")
 		      prog-name))
-    (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm initial-input))intro (1)
+    (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm initial-input)))
+(local-set-key (kbd "C-c C-m") 'my-man)
+intro (7)
+7 intro
+intro(7)
+intro
   ;; END TESTING
     ;; CONTINUE HERE with properly prompting for user input
     ;; If prog-name is empty, signal an error.
