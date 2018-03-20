@@ -19,7 +19,8 @@
   (interactive)
   (let ((cntr 1)
         (format-string "")
-        initial-input
+        input-initial
+        input-user
         list1
         list2
         list3
@@ -103,6 +104,7 @@
 	(if (not prog-name)
 	    (setq prog-name prog-name-and-sec-num)))
       ;; If the region is not active, obtain the program name and, if present, the section number by scanning for text at point enclosed in the delimiting characters.
+      ;; TODO: construct the following character alternative automatically (try (apply 'concat (sort (delete-dups (split-string (apply 'concat my-man-known-programs-only) "")) 'string<)))
       (let (p1 p2 (delim-chars "[a-z0-9:._-]"))
         (save-excursion (skip-chars-backward delim-chars (point-min))
 		    (setq p1 (point))
@@ -114,21 +116,23 @@
 		        (setq sec-num (match-string 1))))
         (set-match-data match-data-old)
         (setq prog-name (buffer-substring-no-properties p1 p2))))
-    ;; BEGIN TESTING
-    (setq initial-input (if sec-num
+    ;; Prompt for user input.
+    (setq input-initial (if sec-num
 		        (concat prog-name "(" sec-num ")")
 		      prog-name))
-    (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm initial-input)))
-(local-set-key (kbd "C-c C-m") 'my-man)
-intro (7)
-7 intro
-intro(7)
-intro
-  ;; END TESTING
-    ;; CONTINUE HERE with properly prompting for user input
-    ;; If prog-name is empty, signal an error.
-    (if (string= "" prog-name)
-        (error "Empty program name ignored")
+    (setq input-user (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm input-initial))
+    ;; If "input-user" is empty, signal an error.
+    (if (string= "" input-user)
+        (error "Missing program name")
+      ;; Extract program name and section number from "input-user".
+      ;; CONTINUE HERE
+      ;; BEGIN TESTING
+      ;; (local-set-key (kbd "C-c C-m") 'my-man)
+      )))intro (7)
+       7 intro
+       intro(7)
+       intro
+       ;; END TESTING
       ;; If a man page for "prog-name" exists...
       (if (member prog-name my-man-known-programs-only)
 	(progn
@@ -144,5 +148,4 @@ intro
         ;; ...or text color.
         (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
         (error "Program name %s unknown to man" prog-name)))))
-
 
