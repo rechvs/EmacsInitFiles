@@ -104,7 +104,7 @@
 	(if (not prog-name)
 	    (setq prog-name prog-name-and-sec-num)))
       ;; If the region is not active, obtain the program name and, if present, the section number by scanning for text at point enclosed in the delimiting characters.
-      ;; TODO: construct the following character alternative automatically (try (apply 'concat (sort (delete-dups (split-string (apply 'concat my-man-known-programs-only) "")) 'string<)))
+      ;; TODO: construct the following character alternative automatically; try "(apply 'concat (sort (delete-dups (split-string (apply 'concat my-man-known-programs-only) "")) 'string<))"
       (let (p1 p2 (delim-chars "[a-z0-9:._-]"))
         (save-excursion (skip-chars-backward delim-chars (point-min))
 		    (setq p1 (point))
@@ -117,7 +117,7 @@
         (set-match-data match-data-old)
         (setq prog-name (buffer-substring-no-properties p1 p2))))
     ;; Prompt for user input.
-    (setq input-initial (if sec-num
+    (setq input-initial (if (and (not (null prog-name)) (not (string= "" prog-name)) (not (null sec-num)) (not (string= "" sec-num)))
 		        (concat prog-name "(" sec-num ")")
 		      prog-name))
     (setq input-user (completing-read "Prompt: " my-man-known-programs-plus-sections nil 'confirm input-initial))
@@ -127,25 +127,26 @@
       ;; Extract program name and section number from "input-user".
       ;; CONTINUE HERE
       ;; BEGIN TESTING
-      ;; (local-set-key (kbd "C-c C-m") 'my-man)
-      )))intro (7)
-       7 intro
-       intro(7)
-       intro
-       ;; END TESTING
-      ;; If a man page for "prog-name" exists...
-      (if (member prog-name my-man-known-programs-only)
-	(progn
-	  ;; ...and if the region is active, deactivate the mark...
-	  (if (region-active-p)
-	      (deactivate-mark t))
-	  ;; ...and open the man page for "prog-name" and, if present, "sec-num".
-	  ;; TODO: concatenate "prog-name" and "sec-num" so that they may serve as input for a "(man ...)" call.
-	  (man (concat prog-name sec-num)))
-        ;; If prog-name does not exist, message the user about it.
-        ;; In order to distinguish prog-name from the rest of the message, we can use either quotation marks...
-        ;; (message "File \"%s\" does not exist." prog-name)))))
-        ;; ...or text color.
-        (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
-        (error "Program name %s unknown to man" prog-name)))))
+      )))
+intro (7)
+7 intro
+intro(7)
+intro
+(local-set-key (kbd "C-c C-m") 'my-man)
+;; END TESTING
+;; If a man page for "prog-name" exists...
+(if (member prog-name my-man-known-programs-only)
+    (progn
+      ;; ...and if the region is active, deactivate the mark...
+      (if (region-active-p)
+	(deactivate-mark t))
+      ;; ...and open the man page for "prog-name" and, if present, "sec-num".
+      ;; TODO: concatenate "prog-name" and "sec-num" so that they may serve as input for a "(man ...)" call.
+      (man (concat prog-name sec-num)))
+  ;; If prog-name does not exist, message the user about it.
+  ;; In order to distinguish prog-name from the rest of the message, we can use either quotation marks...
+  ;; (message "File \"%s\" does not exist." prog-name)))))
+  ;; ...or text color.
+  (add-face-text-property 0 (length prog-name) '(:foreground "blue") t prog-name)
+  (error "Program name %s unknown to man" prog-name)))))
 
