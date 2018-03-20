@@ -368,6 +368,19 @@ ignored."
       "Bewerbung.Ausgang"
     "Privat.Ausgang"))
 
+(defun my-set-message-signature ()
+  "Set variable `message-signature', depending on the name of the current buffer. This function is meant to be listed in `gnus-summary-mode-hook'."
+  ()
+  (let ((match-data-old (match-data)))
+    (setq message-signature
+	(if (string-match "^\*Summary Bewerbung\..*$\*" (buffer-name))
+	    "Renke Christian von Seggern
+Magdeburger Weg 1, 37085 Göttingen
+mobil: +49176 953 053 79 fest: +49(551) 401 573 56
+E-Mail: renke.vonseggern@gmx.de"))
+    (set-match-data match-data-old)
+    ))
+
 (defun my-sh-smie-sh-rules (origfun kind token)
   "Custom function to correct indentation in shell scripts after `&&´. Taken from `http://superuser.com/questions/1037043/emacs-suppress-indent-after-in-shell-script-mode´."
   (pcase (cons kind token)
