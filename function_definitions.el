@@ -189,7 +189,7 @@ ignored."
     (let ((from (mail-extract-address-components (mail-header-from hdr)))
 	(to (cdr (assoc 'To (mail-header-extra hdr))))
 	(cc (cdr (assoc 'Cc (mail-header-extra hdr))))
-	(ingorable-adresses-regexp "\\(magic_willebinski\\)\\|\\(members\\)\\|\\(renke.vonseggern\\)@gmx\\.\\(de\\)\\|\\(net\\)")) 
+	(ingorable-adresses-regexp "\\(\\(magic_willebinski\\)\\|\\(members\\)\\|\\(renke.vonseggern\\)\\)@gmx\\.\\(\\(de\\)\\|\\(net\\)\\)"))
       (if (or (and (or (string= "" to) (null to))
 	         (or (string= "" cc) (null cc)))
 	    (string-match-p ingorable-adresses-regexp (if (null to) "" to))
