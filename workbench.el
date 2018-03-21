@@ -14,6 +14,10 @@
   nil
   "List of all programs (with and without sections) known to man.")
 
+(defvar my-man-known-programs-skip-chars-string
+  nil
+  "String covering all characters of all program names known to man.") 
+
 (defun my-man ()
   "If region is active, use text in region as the program name for which to display the man page. \"Program name\" here means the actual program name including the man page section number if present. Otherwise use the text at point as the program name. If it exists, visit the man page via `man'. An empty program name is ignored."
   (interactive)
@@ -28,13 +32,14 @@
         (match-data-old (match-data)) 
         prog-name
         prog-name-and-sec-num
+        prog-names-skip-chars-string
         sec-num
         sec-num-after
         sec-num-before
         sec-nums-regexp
         string1)
     ;; If not already available, create a list of all combinations of program names and section numbers known to "man".
-    (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only) (not my-man-known-sections-regexp))
+    (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only) (not my-man-known-sections-regexp) (not my-man-known-programs-skip-chars-string))
         (progn
 	;; Store the list of all program names and corresponding section numbers known to man in "list1".
 	(setq string1 (shell-command-to-string "apropos -l ."))
@@ -65,13 +70,19 @@
 					     (if (> (count prog-name-only list3 :test 'equal) 1)
 					         prog-name-only))
 					   list3))))
+	;; Create a "(skip-chars-* ...)" string covering all characters contained in "list3".
+	(setq prog-names-skip-chars-string (apply 'concat (sort (delete-dups (split-string (apply 'concat list3) "")) 'string<)))
+	(setq prog-names-skip-chars-string (replace-regexp-in-string "\\\\" "\\\\\\\\" prog-names-skip-chars-string))
+	(setq prog-names-skip-chars-string (replace-regexp-in-string "\\^" "\\\\^" prog-names-skip-chars-string))
+	(setq prog-names-skip-chars-string (replace-regexp-in-string "-" "\\\\-" prog-names-skip-chars-string))
 	;; Add "list4" to "list1".
 	(nconc list1 list4)
 	;; Set Emacs variables.
-	(setq my-man-known-sections-regexp sec-nums-regexp)
+	(setq my-man-known-programs-only (delete-dups list3))
 	(setq my-man-known-programs-plus-sections (sort list1 'string<))
+	(setq my-man-known-programs-skip-chars-string prog-names-skip-chars-string)
 	(setq my-man-known-sections-only list2)
-	(setq my-man-known-programs-only (delete-dups list3))))
+	(setq my-man-known-sections-regexp sec-nums-regexp)))
     ;; If the region is active, obtain program name and, if present, section number from it.
     (if (region-active-p)
         (progn
@@ -104,13 +115,12 @@
 	(if (not prog-name)
 	    (setq prog-name prog-name-and-sec-num)))
       ;; If the region is not active, obtain the program name and, if present, the section number by scanning for text at point enclosed in the delimiting characters.
-      ;; TODO: construct the following character alternative automatically; try "(apply 'concat (sort (delete-dups (split-string (apply 'concat my-man-known-programs-only) "")) 'string<))"
-      (let (p1 p2 (delim-chars "[a-z0-9:._-]"))
-        (save-excursion (skip-chars-backward delim-chars (point-min))
+      (let (p1 p2)
+        (save-excursion (skip-chars-backward my-man-known-programs-skip-chars-string (point-min))
 		    (setq p1 (point))
 		    (if (looking-back (concat "[\n[:space:]]+" my-man-known-sections-regexp " ") (- p1 (+ 2 (apply 'max (mapcar 'length my-man-known-sections-only)))))
 		        (setq sec-num (match-string 1))))
-        (save-excursion (skip-chars-forward delim-chars (point-max))
+        (save-excursion (skip-chars-forward my-man-known-programs-skip-chars-string (point-max))
 		    (setq p2 (point))
 		    (if (looking-at (concat " ?[(]?" my-man-known-sections-regexp "[\n[:space:][:punct:])]+"))
 		        (setq sec-num (match-string 1))))
@@ -132,6 +142,10 @@ intro (7)
 7 intro
 intro(7)
 intro
+systemd-backlight@.service
+[
+ 2to3-3.5
+ 2to3-3.5 (3readline)
 (local-set-key (kbd "C-c C-m") 'my-man)
 ;; END TESTING
 ;; If a man page for "prog-name" exists...
