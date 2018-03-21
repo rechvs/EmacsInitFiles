@@ -183,22 +183,34 @@ ignored."
    (follow-mode t))))
 
 (defun gnus-user-format-function-a (hdr)
-  "If HDR is not a vector, return the string \"void\". Otherwise, if the value of the To: header is one of my email addresses, return the From: header, else return the To: header. In both cases, prefer the full name of sender/recipient if present, otherwise use only the email address. See `gnus-summary-line-format' on how this function interfaces with Gnus."
+  "If HDR is not a vector, return the string \"void\". Otherwise, if one of my addresses is contained in either the To: or the Cc: header or if both these headers are empty, return the From: header; else return the To: header or, if that is empty, the Cc: header. In all cases, prefer the full name contained in the header if present, otherwise use only the email address. See `gnus-summary-line-format' on how this function interfaces with Gnus."
   (if (not (vectorp hdr))
       "void"
     (let ((from (mail-extract-address-components (mail-header-from hdr)))
-	(to (cdr (assoc 'To (mail-header-extra hdr)))))
-      (setq from (if (null (nth 0 from))
-		 (nth 1 from)
-	         (nth 0 from)))
-      (if (or (null to)
-	    (string-match "[[:alnum:][:punct:] ]*\\(magic_willebinski\\)\\|\\(renke.vonseggern\\)@gmx\\.de" to))
-	from
+	(to (cdr (assoc 'To (mail-header-extra hdr))))
+	(cc (cdr (assoc 'Cc (mail-header-extra hdr))))
+	(ingorable-adresses-regexp "\\(magic_willebinski\\)\\|\\(members\\)\\|\\(renke.vonseggern\\)@gmx\\.\\(de\\)\\|\\(net\\)")) 
+      (if (or (and (or (string= "" to) (null to))
+	         (or (string= "" cc) (null cc)))
+	    (string-match-p ingorable-adresses-regexp (if (null to) "" to))
+	    (string-match-p ingorable-adresses-regexp (if (null cc) "" cc)))
+	(progn
+	  (setq from (if (null (nth 0 from))
+		       (nth 1 from)
+		     (nth 0 from)))
+	  from)
         (setq to (mail-extract-address-components to))
         (setq to (if (null (nth 0 to))
 		 (nth 1 to)
 	         (nth 0 to)))
-        to))))
+        (if (null to)
+	  (progn
+	    (setq cc (mail-extract-address-components cc))
+	    (setq cc (if (null (nth 0 cc))
+		       (nth 1 cc)
+		     (nth 0 cc)))
+	    cc)
+	to)))))
 
 (defun my-hiwi-ssh-bayeos ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
