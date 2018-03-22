@@ -27,8 +27,7 @@
 (defun my-man ()
   "If region is active, use text in region as the program name for which to display the man page. \"Program name\" here means the actual program name including the man page section number if present. Otherwise use the text at point as the program name. If it exists, visit the man page via `man'. An empty program name is ignored."
   (interactive)
-  (let ((cntr 1)
-        (format-string "")
+  (let ((format-string "")
         input-initial
         input-user
         list1
@@ -60,9 +59,7 @@
 					   (match-string 1 prog-name-plus-sec-num)))
 				       list1)))
 	    ;; Create a proper regexp to cover all section numbers based on "list2".
-	    (while (<= cntr (length list2))
-	      (setq format-string (concat format-string "\\(%s\\)\\|"))
-	      (setq cntr (1+ cntr)))
+	    (setq format-string (apply 'concat (make-list (length list2) "\\(%s\\)\\|")))
 	    (setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
 	    (setq list2 (sort list2 'string<))
 	    (setq sec-nums-regexp (apply 'format format-string list2))
@@ -147,9 +144,16 @@
 			(match-string 1 input-user))
 		      input-user))
         (setq prog-name-and-sec-num (concat prog-name (if sec-num (concat "." sec-num))))
-        ;; TODO: create a string (comma separated list) from "my-man-known-sections-only" which would be suited as an argument for "man -S ..." and subsequently check whether the value of "Man-switches" is up-to-date; if not, suggest updating "Man-switches".
+        ;; Create the format string needed to create a comma separated list of section names based on "my-man-known-sections-only" which would be suited as an argument for "man -S ...".
+        (setq format-string (apply 'concat (make-list (length my-man-known-sections-only) "%s,")))
+        (setq format-string (substring format-string 0 (1- (length format-string))))
         ;; Invoke man.
-        (man prog-name-and-sec-num))
+        (man prog-name-and-sec-num)
+        ;; If the section list in "Man-switches" is outdated, inform about it (after waiting for the man page generation subprocess to finish).
+        (while (process-status "man")
+	(sleep-for 0.001))
+        (if (not (string-match-p (apply 'format format-string my-man-known-sections-only) Man-switches))
+	  (display-message-or-buffer (concat "The sections list in Man-switches seems to be outdated (updated value: " (apply 'format format-string my-man-known-sections-only) ")."))))
       (set-match-data match-data-old))))
 ;; BEGIN TESTING
 ;; systemd-backlight@.service
