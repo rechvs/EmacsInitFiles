@@ -149,7 +149,7 @@
         (setq format-string (substring format-string 0 (1- (length format-string))))
         ;; Invoke man.
         (man prog-name-and-sec-num)
-        ;; If the section list in "Man-switches" is outdated, inform about it (after waiting for the man page generation subprocess to finish).
+        ;; If the sections list in "Man-switches" is outdated, inform about it (after waiting for the man page generation subprocess to finish).
         (while (process-status "man")
 	(sleep-for 0.001))
         (if (not (string-match-p (apply 'format format-string my-man-known-sections-only) Man-switches))
