@@ -50,8 +50,7 @@
 	    (setq list2 (delete-dups (mapcar (lambda
 				         (prog-name-plus-sec-num)
 				         (if (string-match "(\\(.*\\))$" prog-name-plus-sec-num)
-					   (substring prog-name-plus-sec-num (match-beginning 1) (match-end 1))
-					 ))
+					   (match-string 1 prog-name-plus-sec-num)))
 				       list1)))
 	    ;; Create a proper regexp to cover all section numbers based on "list2".
 	    (while (<= cntr (length list2))
@@ -92,24 +91,20 @@
 	    (setq sec-num-before (string-match (concat "^" my-man-known-sections-regexp " ") prog-name-and-sec-num))
 	    (if sec-num-before
 	        (progn
-		(setq sec-num-before (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
-		(setq prog-name (substring prog-name-and-sec-num (match-end 0)))
-		))
+		(setq sec-num-before (match-string 1 prog-name-and-sec-num))
+		(setq prog-name (substring prog-name-and-sec-num (match-end 0)))))
 	    ;; Check whether the section number is mentioned after the program name. If so, extract it and the program name.
 	    (setq sec-num-after (string-match (concat " ?[(]?" my-man-known-sections-regexp ")?$") prog-name-and-sec-num))
 	    (if (and sec-num-after (not sec-num-before)) ;We also check that "sec-num-before" is unset because that should be preferred over "sec-num-after".
 	        (progn
-		(setq sec-num-after (substring prog-name-and-sec-num (match-beginning 1) (match-end 1)))
-		(setq prog-name (substring prog-name-and-sec-num 0 (match-beginning 0)))
-		))
+		(setq sec-num-after (match-string 1 prog-name-and-sec-num))
+		(setq prog-name (substring prog-name-and-sec-num 0 (match-beginning 0)))))
 	    ;; Extract the actual section number from the check results.
 	    (setq sec-num (catch 'here
 			(mapc (lambda
 			        (element)
 			        (if element
-				  (throw 'here element)
-				;; (throw 'here nil)
-				))
+				  (throw 'here element)))
 			      (list sec-num-before sec-num-after))))
 	    (setq sec-num (delq nil sec-num))	;This is required in order to allow using "sec-num" as a boolean value further down.
 	    ;; If the "prog-name" hasn't been set by now, use the original region content.
