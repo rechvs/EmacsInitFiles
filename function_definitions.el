@@ -287,9 +287,8 @@ ignored."
   "Use text in region or around point as the program name (and section number
 if present) for which to display the man page(s). Supported formats for
 guessing the section number are: SECNUM PROGNAME, PROGNAME(SECNUM), PROGNAME
-(SECNUM). An empty program name is ignored. If called with a prefix argument,
-rebuild the lists of all program names and section numbers known to man. This
-function requires variables `my-man-input-hist', `my-man-known-programs-only',
+(SECNUM). If called with a prefix argument, reset the following variables
+based on the output of \"apropos -l .\": `my-man-known-programs-only',
 `my-man-known-programs-plus-sections',
 `my-man-known-programs-skip-chars-string', `my-man-known-sections-only', and
 `my-man-known-sections-regexp'."
