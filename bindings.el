@@ -2,6 +2,8 @@
 
 (global-set-key (kbd "M-ö") 'my-immediately-switch-to-buffer)
 
+(global-set-key (kbd "C-c C-m") 'my-man)
+
 (global-set-key (kbd "C-e") 'my-move-end-of-line)
 
 (global-set-key (kbd "C-<") 'my-other-window)
