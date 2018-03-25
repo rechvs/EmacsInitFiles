@@ -63,6 +63,7 @@ function requires variables `my-man-input-hist', `my-man-known-programs-only',
 ;; If not already available, create a list of all combinations of program names and section numbers known to "man".
 (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only) (not my-man-known-sections-regexp) (not my-man-known-programs-skip-chars-string) prefix-arg)
     (progn
+      (display-message-or-buffer "Rebuilding the list of all program names plus section numbers known to man...")
       ;; Store the list of all program names and corresponding section numbers known to man in "list1".
       (setq string1 (shell-command-to-string "apropos -l ."))
       (setq string1 (replace-regexp-in-string " (" "(" (replace-regexp-in-string ",$" "" (replace-regexp-in-string " +- .*\n" "," string1))))
@@ -84,7 +85,6 @@ function requires variables `my-man-input-hist', `my-man-known-programs-only',
 		        (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
 		      list1))
       ;; Store names of programs with man pages in multiple sections in "list4".
-      (display-message-or-buffer "Rebuilding the list of all program names plus section numbers known to man...")
       (setq list4 (delq nil (delete-dups (mapcar (lambda
 					 (prog-name-only)
 					 (if (> (count prog-name-only list3 :test 'equal) 1)
