@@ -440,6 +440,8 @@ string1)
     ;; Create the format string needed to create a comma separated list of section names based on "my-man-known-sections-only" which would be suited as an argument for "man -S ...".
     (setq format-string (apply 'concat (make-list (length my-man-known-sections-only) "%s,")))
     (setq format-string (substring format-string 0 (1- (length format-string))))
+    ;; Set "Man-width" to half the current frame width minus 4 columns.
+    (setq Man-width (/ (- (frame-width) 4) 2))
     ;; Invoke man.
     (setq man-buffer (man prog-name-and-sec-num))
     ;; Wait for the man subprocess to finish.
