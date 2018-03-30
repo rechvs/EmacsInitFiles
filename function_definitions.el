@@ -469,37 +469,18 @@ string1)
       (set-match-data match-data-old))))
 
 (defun my-move-end-of-line ()
-  "If point is not at the end of the current line, move point to the end of the current visual line. If point is at the end of the current visual line, move point to the beginning of the last whitespace character sequence on the current visual line."
+  "If point is not at the beginning of text matching `my-move-end-of-line-skip-regexp' (terminated at end of current visual line), move point there. Otherwise, move point to end of current visual line."
   (interactive)
-  (if visual-line-mode
-      (progn
-        (setq LINEEND (save-excursion (end-of-visual-line nil) (point)))
-        (setq LINEBEGINNING (save-excursion (beginning-of-visual-line nil) (point)))
-        (setq POSAFTERSKIP (save-excursion (goto-char LINEBEGINNING) (skip-chars-forward "[:space:]" LINEEND) (point)))
-        (if (= POSAFTERSKIP LINEEND)
-	  (setq ONLYWHITESPACE t)
-	(setq ONLYWHITESPACE nil))
-        (if (not (eq (point) LINEEND))
-	  (end-of-visual-line nil)
-	(if ONLYWHITESPACE
-	    (goto-char LINEBEGINNING)
-	  (end-of-visual-line nil)
-	  (search-backward-regexp "[^ ]" LINEBEGINNING)
-	  (forward-char))))
-    (progn
-      (setq LINEEND (save-excursion (move-end-of-line nil) (point)))
-      (setq LINEBEGINNING (save-excursion (move-beginning-of-line nil) (point)))
-      (setq POSAFTERSKIP (save-excursion (goto-char LINEBEGINNING) (skip-chars-forward "[:space:]" LINEEND) (point)))
-      (if (= POSAFTERSKIP LINEEND)
-	(setq ONLYWHITESPACE t)
-        (setq ONLYWHITESPACE nil))
-      (if (not (eq (point) LINEEND))
-	(move-end-of-line nil)
-        (if ONLYWHITESPACE
-	  (goto-char LINEBEGINNING)
-	(move-end-of-line nil)
-	(search-backward-regexp "[^ ]" LINEBEGINNING)
-	(forward-char))))))
+  (let* ((match-data-old (match-data))
+         (eol (save-excursion (end-of-visual-line) (point)))
+         (bol (save-excursion (beginning-of-visual-line) (point)))
+         (bor (save-excursion (goto-char eol) (if (looking-back my-move-end-of-line-skip-regexp bol t) (match-beginning 0) eol))))
+    (unwind-protect
+        (progn
+	(if (not (= (point) bor))
+	    (goto-char bor)
+	  (goto-char eol)))
+      (set-match-data match-data-old))))
 
 (defun my-newline-at-80 ()
   "Insert newline character after column 80 or, if there is a nonwhitespace character in column 80, at the beginning of the last whitespace character sequence before column 80."
