@@ -455,6 +455,19 @@ string1)
 	  (display-message-or-buffer (concat "The sections list in Man-switches seems to be outdated (updated value: " (apply 'format format-string my-man-known-sections-only) ").")))))
   (set-match-data match-data-old))))
 
+(defun my-move-beginning-of-line ()
+  "If point is not at the end of text matching `my-move-beginning-of-line-skip-regexp' (anchored at beginning of current visual line), move point there. Otherwise, move point to beginning of current visual line."
+  (interactive)
+  (let* ((match-data-old (match-data))
+         (bol (save-excursion (beginning-of-visual-line) (point)))
+         (eor (save-excursion (goto-char bol) (if (looking-at my-move-beginning-of-line-skip-regexp) (match-end 0) bol))))
+    (unwind-protect
+        (progn
+	(if (not (= (point) eor))
+	    (goto-char eor)
+	  (goto-char bol)))
+      (set-match-data match-data-old))))
+
 (defun my-move-end-of-line ()
   "If point is not at the end of the current line, move point to the end of the current visual line. If point is at the end of the current visual line, move point to the beginning of the last whitespace character sequence on the current visual line."
   (interactive)
