@@ -90,3 +90,9 @@
 (defvar my-man-known-sections-regexp
   "\\(\\(1\\)\\|\\(1p\\)\\|\\(1ssl\\)\\|\\(2\\)\\|\\(3\\)\\|\\(3am\\)\\|\\(3caca\\)\\|\\(3perl\\)\\|\\(3pm\\)\\|\\(3readline\\)\\|\\(3ssl\\)\\|\\(3tiff\\)\\|\\(4\\)\\|\\(5\\)\\|\\(5ssl\\)\\|\\(6\\)\\|\\(6x\\)\\|\\(7\\)\\|\\(7ssl\\)\\|\\(8\\)\\)"
   "Regexp covering all sections known to man.")
+
+(defcustom my-move-beginning-of-line-skip-regexp
+    "[[:space:]]+"
+    "See `my-move-beginning-of-line'."
+    :type '(regexp))
+  (make-variable-buffer-local 'my-move-beginning-of-line-skip-regexp)
