@@ -456,10 +456,10 @@ string1)
   (set-match-data match-data-old))))
 
 (defun my-move-beginning-of-line ()
-  "If point is not at the end of text matching `my-move-beginning-of-line-skip-regexp' (anchored at beginning of current visual line), move point there. Otherwise, move point to beginning of current visual line."
+  "If point is not at the end of text matching `my-move-beginning-of-line-skip-regexp' (anchored at beginning of current line), move point there. Otherwise, move point to beginning of current line. \"Line\" here means either the visual or the logical line, depending on whether `visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
-         (bol (save-excursion (beginning-of-visual-line) (point)))
+         (bol (save-excursion (if visual-line-mode (beginning-of-visual-line) (beginning-of-line)) (point)))
          (eor (save-excursion (goto-char bol) (if (looking-at my-move-beginning-of-line-skip-regexp) (match-end 0) bol))))
     (unwind-protect
         (progn
@@ -469,11 +469,11 @@ string1)
       (set-match-data match-data-old))))
 
 (defun my-move-end-of-line ()
-  "If point is not at the beginning of text matching `my-move-end-of-line-skip-regexp' (terminated at end of current visual line), move point there. Otherwise, move point to end of current visual line."
+  "If point is not at the beginning of text matching `my-move-end-of-line-skip-regexp' (terminated at end of current line), move point there. Otherwise, move point to end of current line. \"Line\" here means either the visual or the logical line, depending on whether `visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
-         (eol (save-excursion (end-of-visual-line) (point)))
-         (bol (save-excursion (beginning-of-visual-line) (point)))
+         (eol (save-excursion (if visual-line-mode (end-of-visual-line) (end-of-line)) (point)))
+         (bol (save-excursion (if visual-line-mode (beginning-of-visual-line) (beginning-of-line)) (point)))
          (bor (save-excursion (goto-char eol) (if (looking-back my-move-end-of-line-skip-regexp bol t) (match-beginning 0) eol))))
     (unwind-protect
         (progn
