@@ -102,3 +102,7 @@
   "See `my-move-end-of-line'."
   :type '(regexp))
 (make-variable-buffer-local 'my-move-end-of-line-skip-regexp)
+
+(defvar my-newline-at-col
+  78
+  "Target column for `my-newline-at'.")
