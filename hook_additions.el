@@ -23,6 +23,7 @@
 (add-hook 'gnus-summary-mode-hook 'hl-line-mode)
 (add-hook 'gnus-summary-mode-hook 'my-set-message-signature)
 
+(add-hook 'LaTeX-mode-hook '(lambda () (setq my-move-end-of-line-skip-regexp "[ 	]+%.*$")))
 (add-hook 'LaTeX-mode-hook '(lambda () (setq TeX-command-default "LatexMake")))	; The string must correspond to a handle in variable "TeX-command-list".
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-bindings)
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-symbol-additions)
