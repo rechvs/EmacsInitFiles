@@ -1,19 +1,36 @@
-(defun my-visit-file-add-to-git-whitelist ()
-  "Ask for a filename. If the file is accessible and not already mentioned in \"~/.gitignore\", ask for a comment, and add comment and negated filename to \"~/.gitignore\". If accessible, visit the file."
-  (interactive)
-  (let (cmmnt curbuflst dir flnm flnmexp gitigbuf gitigflnm gitigflnmexp)
+(defun my-visit-file-add-to-git-whitelist (&optional arg)
+  "If called with prefix argument ARG, prompt for git repository directory, otherwise use \"~/\" as default. Prompt for filename. If the file is accessible and not already mentioned in gitignore file, ask for comment and add comment and negated filename to it. Visit the file."
+  (interactive "P")
+  (let (cmmnt
+        curbuflst
+        dir
+        flnm-for-visit
+        flnm
+        flnmexp
+        gitigbuf
+        gitigflnm
+        gitigflnmexp
+        git-repo-dir
+        (home-dir-path "~/"))
     (catch 'outer
       (catch 'inner
         ;; Store current buffer list in "curbuflst".
         (setq curbuflst (buffer-list))
-        ;; Store path to "~/.gitignore" in "gitigflnm".
-        (setq gitigflnm "~/.gitignore")
+        ;; If called with (prefix) argument, prompt for git repository directory, otherwise set it to "/~".
+        (setq git-repo-dir (if arg (read-directory-name (concat "Git repository directory: "))
+			  home-dir-path))
+        ;; Store path to gitignore file in "gitigflnm".
+        (setq gitigflnm (concat git-repo-dir ".gitignore"))
         ;; Store expansion of "gitigflnm" in "gitigflnmexp".
         (setq gitigflnmexp (expand-file-name gitigflnm))
-        ;; Ask for filename, store it in "flnm".
+        ;; Ask for filename, store it in "flnm" and "flnm-for-visit".
         (setq flnm (read-file-name "Filename: "))
+        (setq flnm-for-visit flnm)
         ;; Store expansion of "flnm" in "flnmexp".
         (setq flnmexp (expand-file-name flnm))
+        ;; Ensure that the file is actually trackable by the git repository.
+        (if (not (string-match-p (regexp-quote (expand-file-name git-repo-dir)) flnmexp))
+	  (error (concat "File " flnm " not trackable by Git repository " git-repo-dir)))
         ;; Store directory component of "flnm" in "dir".
         (setq dir (file-name-directory flnm))
         ;; Add text properties to strings for pretty printing.
@@ -34,8 +51,8 @@
         (if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
 	  (throw 'outer (message "File %s is not writable." gitigflnm)))
         ;; Remove either "~/" or the expansion of "~/" from the beginning of "flnm" and "flnmexp".
-        (setq flnm (replace-regexp-in-string (concat "\\(^~/\\)\\|\\(^" (expand-file-name "~/") "\\)") "" flnm))
-        (setq flnmexp (replace-regexp-in-string (concat "\\(^~/\\)\\|\\(^" (expand-file-name "~/") "\\)") "" flnmexp))
+        (setq flnm (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnm))
+        (setq flnmexp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnmexp))
         ;; Visit "gitigflnmexp" and store the resulting buffer in "gitigbuf".
         (save-excursion
 	(setq gitigbuf (find-file-noselect gitigflnmexp))
@@ -44,13 +61,13 @@
 	(goto-char (point-min))
 	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
 	(if (search-forward-regexp (concat "^" flnm "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s’s blacklist." flnm gitigflnm)))
+	    (throw 'inner (message "Filename %s is already present in %s's blacklist." flnm gitigflnm)))
 	(if (search-forward-regexp (concat "^" flnmexp "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s’s blacklist." flnmexp gitigflnm)))
+	    (throw 'inner (message "Filename %s is already present in %s's blacklist." flnmexp gitigflnm)))
 	(if (search-forward-regexp (concat "^!" flnm "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s’s whitelist." flnm gitigflnm)))
+	    (throw 'inner (message "Filename %s is already present in %s's whitelist." flnm gitigflnm)))
 	(if (search-forward-regexp (concat "^!" flnmexp "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s’s whitelist." flnmexp gitigflnm)))
+	    (throw 'inner (message "Filename %s is already present in %s's whitelist." flnmexp gitigflnm)))
 	;; Ask for a comment.
 	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
 	;; Trim comment of leading and trailing whitespace.
@@ -76,4 +93,4 @@
 	(if (not (member gitigbuf curbuflst))
 	    (kill-buffer gitigbuf))))
       ;; Visit the specified file.
-      (find-file flnm))))
+      (find-file flnm-for-visit))))
