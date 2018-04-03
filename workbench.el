@@ -9,8 +9,8 @@
         dir
         direxp
         file-is-dir
-        flnm-for-visit
         flnm
+        flnm-for-visit
         flnmexp
         gitigbuf
         gitigflnm
@@ -87,6 +87,7 @@
 	      (setq bl-end (point))))
 	(if (and bl-start bl-end (< bl-start bl-end))
 	    (setq bl (delete "" (split-string (buffer-substring-no-properties bl-start bl-end) "\n"))))
+	;; TODO: remove commented entries from blacklist
 	;; Check blacklist for consistency.
 	(if (memq t (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) bl))
 	    (error "Blacklist in %s inconsistent" gitigflnm))
@@ -102,31 +103,26 @@
 	      (setq wl-end (point))))
 	(if (and wl-start wl-end (< wl-start wl-end))
 	    (setq wl (delete "" (split-string (buffer-substring-no-properties wl-start wl-end) "\n"))))
+	;; TODO: remove commented entries from whitelist
 	;; Check whitelist for consistency.
 	(if (memq nil (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) wl))
 	    (error "Whitelist in %s inconsistent" gitigflnm))
+	;; Check whether the supplied filename (or its expanded equivalent) is already present in either the black- or the whitelist. If yes, inform about it and skip ahead to visiting the file.
+	(if (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))
+	    (throw 'inner (message "Filename %s or its expansion is already present in black- or whitelist in %s." flnm gitigflnm)))
 	;; TODO: add mechanism for whitelisting "dir" (i.e., the path component of "flnm") without whitelisting the same directory twice (solution: create an Elisp list from the whitelist, then apply "(delete-dups ...)" to it
 	;; BEGIN TESTING
 	;; (setq test (mapcar (lambda (elt)
 	;; (set-text-properties 0 (length elt) nil elt)
 	;; elt)
-	;; (list dir direxp flnm flnmexp)))
+	;; (display-message-or-buffer (prin1-to-string (list dir direxp flnm flnmexp)))
 	;; (display-message-or-buffer (prin1-to-string test))
 	;; (display-message-or-buffer (prin1-to-string bl))
 	;; (display-message-or-buffer (prin1-to-string wl))
 	;; (display-message-or-buffer (prin1-to-string (length wl)))
+	(display-message-or-buffer (prin1-to-string (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))))
 	)))))
 ;; END TESTING
-	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
-	(goto-char (point-min))
-	(if (search-forward-regexp (concat "^" flnm "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s's blacklist." flnm gitigflnm)))
-	(if (search-forward-regexp (concat "^" flnmexp "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s's blacklist." flnmexp gitigflnm)))
-	(if (search-forward-regexp (concat "^!" flnm "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s's whitelist." flnm gitigflnm)))
-	(if (search-forward-regexp (concat "^!" flnmexp "$") nil t)
-	    (throw 'inner (message "Filename %s is already present in %s's whitelist." flnmexp gitigflnm)))
 	;; Ask for a comment.
 	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
 	;; Trim comment of leading and trailing whitespace.
