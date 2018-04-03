@@ -1,7 +1,8 @@
 (defun my-visit-file-add-to-git-whitelist (&optional arg)
   "If called with prefix argument ARG, prompt for git repository directory, otherwise use \"~/\" as default. Prompt for filename. If the file is accessible and not already mentioned in gitignore file, ask for comment and add comment and negated filename to it. Visit the file."
   (interactive "P")
-  (let (bl-start
+  (let (bl
+        bl-start
         bl-end
         cmmnt
         curbuflst
@@ -74,7 +75,21 @@
 	(setq gitigbuf (find-file-noselect gitigflnmexp))
 	;; Make "gitigbuf" the current buffer.
 	(set-buffer gitigbuf)
+	;; Create Elisp list from blacklist.
 	(goto-char (point-min))
+	(if (search-forward-regexp "^# BLACKLIST START" (point-max) t)
+	    (progn
+	      (move-beginning-of-line 2)
+	      (setq bl-start (point))))
+	(if (and bl-start (search-forward-regexp "^# BLACKLIST END" (point-max)))
+	    (progn
+	      (move-end-of-line 0)
+	      (setq bl-end (point))))
+	(if (and bl-start bl-end (< bl-start bl-end))
+	    (setq bl (delete "" (split-string (buffer-substring-no-properties bl-start bl-end) "\n"))))
+	;; Check blacklist for consistency.
+	(if (memq t (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) bl))
+	    (error "Blacklist in %s inconsistent" gitigflnm))
 	;; Create Elisp list from whitelist.
 	(goto-char (point-min))
 	(if (search-forward-regexp "^# WHITELIST START" (point-max) t)
@@ -85,20 +100,25 @@
 	    (progn
 	      (move-end-of-line 0)
 	      (setq wl-end (point))))
-	(if (and wl-start wl-end)
+	(if (and wl-start wl-end (< wl-start wl-end))
 	    (setq wl (delete "" (split-string (buffer-substring-no-properties wl-start wl-end) "\n"))))
+	;; Check whitelist for consistency.
+	(if (memq nil (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) wl))
+	    (error "Whitelist in %s inconsistent" gitigflnm))
 	;; TODO: add mechanism for whitelisting "dir" (i.e., the path component of "flnm") without whitelisting the same directory twice (solution: create an Elisp list from the whitelist, then apply "(delete-dups ...)" to it
 	;; BEGIN TESTING
 	;; (setq test (mapcar (lambda (elt)
-			 ;; (set-text-properties 0 (length elt) nil elt)
-			 ;; elt)
-		         ;; (list dir direxp flnm flnmexp)))
+	;; (set-text-properties 0 (length elt) nil elt)
+	;; elt)
+	;; (list dir direxp flnm flnmexp)))
 	;; (display-message-or-buffer (prin1-to-string test))
-	(display-message-or-buffer (prin1-to-string wl))
+	;; (display-message-or-buffer (prin1-to-string bl))
+	;; (display-message-or-buffer (prin1-to-string wl))
 	;; (display-message-or-buffer (prin1-to-string (length wl)))
 	)))))
 ;; END TESTING
 	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
+	(goto-char (point-min))
 	(if (search-forward-regexp (concat "^" flnm "$") nil t)
 	    (throw 'inner (message "Filename %s is already present in %s's blacklist." flnm gitigflnm)))
 	(if (search-forward-regexp (concat "^" flnmexp "$") nil t)
