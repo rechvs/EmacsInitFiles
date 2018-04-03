@@ -86,7 +86,7 @@
 	      (move-end-of-line 0)
 	      (setq wl-end (point))))
 	(if (and wl-start wl-end)
-	    (setq wl (split-string (buffer-substring-no-properties wl-start wl-end) "\n")))
+	    (setq wl (delete "" (split-string (buffer-substring-no-properties wl-start wl-end) "\n"))))
 	;; TODO: add mechanism for whitelisting "dir" (i.e., the path component of "flnm") without whitelisting the same directory twice (solution: create an Elisp list from the whitelist, then apply "(delete-dups ...)" to it
 	;; BEGIN TESTING
 	;; (setq test (mapcar (lambda (elt)
@@ -95,6 +95,7 @@
 		         ;; (list dir direxp flnm flnmexp)))
 	;; (display-message-or-buffer (prin1-to-string test))
 	(display-message-or-buffer (prin1-to-string wl))
+	;; (display-message-or-buffer (prin1-to-string (length wl)))
 	)))))
 ;; END TESTING
 	;; If the supplied filename (or its expanded equivalent) is already present in "gitigbuf" (either in its blacklist or in its whitelist), inform about it and skip ahead to visiting the specified file.
