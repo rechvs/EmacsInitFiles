@@ -32,7 +32,12 @@
         ;; Store expansion of "gitigflnm" in "gitigflnmexp".
         (setq gitigflnmexp (expand-file-name gitigflnm))
         ;; Ask for filename, store it in "flnm" and "flnm-for-visit".
-        (setq flnm (read-file-name "Filename: "))
+        (setq flnm (read-file-name "Filename: " nil nil nil ""))
+        ;; Ensure that if "flnm" names a directory it ends with "/".
+        (if (file-directory-p flnm)
+	  (if (not (string= "/" (substring flnm -1)))
+	  (setq flnm (concat flnm "/"))))
+        ;; current buffer is visiting file => visited file is default
         (setq flnm-for-visit flnm)
         ;; Check whether the specified file is a directory.
         (if (file-directory-p flnm) (setq file-is-dir t))
@@ -120,7 +125,11 @@
 	;; (display-message-or-buffer (prin1-to-string bl))
 	;; (display-message-or-buffer (prin1-to-string wl))
 	;; (display-message-or-buffer (prin1-to-string (length wl)))
-	(display-message-or-buffer (prin1-to-string (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))))
+	;; (display-message-or-buffer (prin1-to-string (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))))
+	;; (display-message-or-buffer (prin1-to-string flnm))
+	;; (display-message-or-buffer (prin1-to-string bl))
+	;; (display-message-or-buffer (prin1-to-string (member flnm bl)))
+	(display-message-or-buffer (prin1-to-string (list flnm bl)))
 	)))))
 ;; END TESTING
 	;; Ask for a comment.
