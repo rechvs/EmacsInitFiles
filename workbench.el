@@ -5,7 +5,6 @@
         bl-start
         bl-end
         curbuflst
-        dir
         dirs-list
         (dir-tmp "")
         flnm
@@ -48,18 +47,13 @@
 	      ;; Append "/**".
 	      (setq flnm (concat (file-name-as-directory flnm) "**"))
 	      (setq flnmexp (concat (file-name-as-directory flnmexp) "**"))))
-	;; Store directory component of "flnm" in "dir", while ensuring that both end with "/".
-	(setq dir (file-name-directory flnm))
-	(if (not (string= "/" (substring dir -1)))
-	    (setq dir (concat dir "/")))
 	;; Add text properties to strings for pretty printing.
-	(add-face-text-property 0 (length dir) '(:foreground "blue") t dir)
 	(add-face-text-property 0 (length flnm) '(:foreground "blue") t flnm)
 	(add-face-text-property 0 (length flnmexp) '(:foreground "blue") t flnmexp)
 	(add-face-text-property 0 (length gitigflnm) '(:foreground "blue") t gitigflnm)
 	;; Check whether "flnm" and "dir" are accessible/readable/writable, stop if not.
 	(if (not (file-accessible-directory-p (file-name-directory flnm)))
-	    (error "Directory %s is not accessible." dir))
+	    (error "Directory %s is not accessible." (file-name-directory flnm)))
 	(if (and (file-exists-p flnm) (not (file-readable-p flnm)))
 	    (error "File %s is not readable." flnm))
 	(if (and (file-exists-p flnm) (not (file-writable-p flnm)))
@@ -69,8 +63,7 @@
 	    (error "File %s is not readable." gitigflnm))
 	(if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
 	    (error "File %s is not writable." gitigflnm))
-	;; Remove the provided Git repo directory or its expansion from the beginning of "dir", "flnm", and "flnmexp".
-	(setq dir (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" dir))
+	;; Remove the provided Git repo directory or its expansion from the beginning of "flnm" and "flnmexp".
 	(setq flnm (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnm))
 	(setq flnmexp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnmexp))
 	(save-excursion
