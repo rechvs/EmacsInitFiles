@@ -10,7 +10,6 @@
         direxp
         dirs-list
         (dir-tmp "")
-        file-is-dir
         flnm
         flnm-for-visit
         flnmexp
@@ -35,14 +34,21 @@
         (setq gitigflnmexp (expand-file-name gitigflnm))
         ;; Ask for filename, store it in "flnm" and "flnm-for-visit".
         (setq flnm (read-file-name "Filename: " nil nil nil ""))
+        (setq flnm-for-visit flnm)
         ;; Ensure that if "flnm" names a directory it ends with "/".
         (if (file-directory-p flnm)
 	  (if (not (string= "/" (substring flnm -1)))
 	      (setq flnm (concat flnm "/"))))
-        ;; current buffer is visiting file => visited file is default
-        (setq flnm-for-visit flnm)
-        ;; Check whether the specified file is a directory.
-        (if (file-directory-p flnm) (setq file-is-dir t))
+        ;; If "flnm" is a directory, ensure it is correctly formatted for usage in whitelist.
+        (if (file-directory-p flnm)
+	  (progn
+	    ;; Ensure that "flnm" does not start with a "/".
+	    (if (string= "/" (substring flnm 0 1))
+	        (setq flnm (substring flnm 1)))
+	    ;; Ensure that "flnm" ends with "/**".
+	    (setq flnm (concat flnm (if (string= "/" (substring flnm -1))
+				  "**"
+				"/**")))))
         ;; Store expansion of "flnm" in "flnmexp".
         (setq flnmexp (expand-file-name flnm))
         ;; Ensure that the file is actually trackable by the git repository.
@@ -139,19 +145,9 @@
 	  (end-of-line)
 	  (insert "\n\n"))
 	;; Remove text properties from "flnm".
-	(set-text-properties 0 (length flnm) nil flnm)
-	;; TODO: check whether the specified file is a directory (because (recursively) whitelisting a directory requires different syntax than whitelisting a single file) 
-	(if file-is-dir
-	    (progn
-	      ;; If "flnm" starts with a "/", remove it.
-	      (if (string= "/" (substring flnm 0 1))
-		(setq flnm (substring flnm 1)))
-	      ;; Ensure that "flnm" ends with "/**".
-	      (setq flnm (concat flnm (if (string= "/" (substring flnm -1))
-				    "**"
-				  "/**"))))))))
+	(set-text-properties 0 (length flnm) nil flnm))))
     ;; BEGIN TESTING
-    (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
+    ;; (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
     ))
 ;; END TESTING
 	;; TODO: add mechanism for ensuring the whitelist to be lexicographically ordered 
