@@ -7,14 +7,19 @@
   (abbrev-mode 1))
 
 (defun my-back-to-indentation ()
-  "Move point to the first character on current line, which is not mentioned in `my-back-to-indentation-skip-chars'."
+  "Move point to the first character on current line, which is not mentioned 
+in `my-back-to-indentation-skip-chars'."
   (interactive "^")
   (beginning-of-line 1)
   (skip-chars-forward my-back-to-indentation-skip-chars (line-end-position))
   (backward-prefix-chars))
 
 (defun my-comment-or-uncomment ()
-  "When region is not active, comment the current line if uncommented, otherwise uncomment it. When region is active, comment uncommented lines and uncomment commented lines that are at least partly contained in region. Lines consisting only of a newline character or of whitespace and a newline character are skipped."
+  "When region is not active, comment the current line if uncommented,
+otherwise uncomment it. When region is active, comment uncommented lines and
+uncomment commented lines that are at least partly contained in region. Lines
+consisting only of a newline character or of whitespace and a newline
+character are skipped."
   (interactive)
   ;; Define a function for commenting or uncommenting the text between 2 positions.
   (cl-flet ((my-comment-or-uncomment-current-line
@@ -170,7 +175,8 @@ ignored."
         (message "File %s does not exist." FILENAME)))))
 
 (defun my-follow-bookmark (BKMK)
-  "Call (`delete-other-windows'), open bookmark BKMK in two vertically separated windows and activate follow-mode."
+  "Call (`delete-other-windows'), open bookmark BKMK in two vertically
+separated windows and activate follow-mode."
   (interactive)
    (list
     (let (BKMKS)
@@ -183,7 +189,14 @@ ignored."
    (follow-mode t))))
 
 (defun gnus-user-format-function-a (hdr)
-  "If HDR is not a vector, return the string \"void\". Otherwise, if one of my addresses is contained in either the To: or the Cc: header or if both these headers are empty, return the From: header; else return the To: header or, if that is empty, the Cc: header. In all cases, prefer the full name contained in the header if present, otherwise use only the email address. See `gnus-summary-line-format' on how this function interfaces with Gnus."
+  "If HDR is not a vector, return the string \"void\". Otherwise,
+if one of my addresses is contained in either the To: or the
+Cc: header or if both these headers are empty, return the From:
+header; else return the To: header or, if that is empty, the
+Cc: header. In all cases, prefer the full name contained in the
+header if present, otherwise use only the email address. See
+`gnus-summary-line-format' on how this function interfaces with
+Gnus."
   (if (not (vectorp hdr))
       "void"
     (let ((from (mail-extract-address-components (mail-header-from hdr)))
@@ -213,17 +226,21 @@ ignored."
 	to)))))
 
 (defun my-hiwi-ssh-bayeos ()
-  "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via `ssh´."
+  "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via
+`ssh´."
   (interactive)
   (find-file "/ssh:aknohl@134.76.19.50:/home/aknohl"))
 
 (defun my-hiwi-ssh-tss ()
-  "Visit directory `/home/lukas´ on host `134.76.19.175 ´ as user `lukas´ via `ssh´."
+  "Visit directory `/home/lukas´ on host `134.76.19.175 ´ as user `lukas´ via
+`ssh´."
   (interactive)
   (find-file "/ssh:lukas@134.76.19.175:/home/lukas"))
 
 (defun my-immediately-switch-to-buffer ()
-  "Immediately switch to the most recently selected buffer other than the current buffer, disregarding buffers already visible. If called in succession, cycle through the list returned by `buffer-list'."
+  "Immediately switch to the most recently selected buffer other than the
+current buffer, disregarding buffers already visible. If called in succession,
+cycle through the list returned by `buffer-list'."
   (interactive)
   (let (WINDOW-LIST (WINDOW_NR 0) (BUFFER-NAME-LIST (list "")) (BUFFER_NR 0) (BUFFER_NEXT_IN_ROW ""))
     (catch 'CATCH
@@ -456,7 +473,11 @@ string1)
   (set-match-data match-data-old))))
 
 (defun my-move-beginning-of-line ()
-  "If point is not at the end of text matching `my-move-beginning-of-line-skip-regexp' (anchored at beginning of current line), move point there. Otherwise, move point to beginning of current line. \"Line\" here means either the visual or the logical line, depending on whether `visual-line-mode' is non-nil or nil."
+  "If point is not at the end of text matching 
+`my-move-beginning-of-line-skip-regexp' (anchored at beginning of current 
+line), move point there. Otherwise, move point to beginning of current line. 
+\"Line\" here means either the visual or the logical line, depending on 
+whether `visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
          (bol (save-excursion (if visual-line-mode (beginning-of-visual-line) (beginning-of-line)) (point)))
@@ -469,7 +490,11 @@ string1)
       (set-match-data match-data-old))))
 
 (defun my-move-end-of-line ()
-  "If point is not at the beginning of text matching `my-move-end-of-line-skip-regexp' (terminated at end of current line), move point there. Otherwise, move point to end of current line. \"Line\" here means either the visual or the logical line, depending on whether `visual-line-mode' is non-nil or nil."
+  "If point is not at the beginning of text matching 
+`my-move-end-of-line-skip-regexp' (terminated at end of current line), move 
+point there. Otherwise, move point to end of current line. \"Line\" here 
+means either the visual or the logical line, depending on whether 
+`visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
          (eol (save-excursion (if visual-line-mode (end-of-visual-line) (end-of-line)) (point)))
@@ -483,11 +508,11 @@ string1)
       (set-match-data match-data-old))))
 
 (defun my-newline-at (&optional col)
-  "Insert newline character after the last whitespace (space or tab) character
-before or in column COL or, if that is nil, column
-`my-newline-at-col'. Move point to next line. When called interactively,
-prefix argument is taken as COL. If prefix argument is non-nil, set
-`my-new-line-at-col' to its value."
+  "Insert newline character after the last whitespace (space or
+tab) character before or in column COL or, if that is nil, column
+`my-newline-at-col'. Move point to next line. When called
+interactively, prefix argument is taken as COL. If prefix
+argument is non-nil, set `my-new-line-at-col' to its value."
   (interactive "p")
   (let* ((cur-col (current-column))
          (cur-line-length (save-excursion (move-end-of-line nil) (current-column)))
@@ -527,7 +552,12 @@ prefix argument is taken as COL. If prefix argument is non-nil, set
   (other-window 1))
 
 (defun my-recenter (ARG)
-  "When called without a prefix argument, redisplay window with point on 10th line of the window. When called with a prefix argument, redisplay window with 1st text line of the current paragraph on 1st line of the window. If current paragraph is too large for this, do the same as if called without a prefix argument."
+  "When called without a prefix argument, redisplay window with
+point on 10th line of the window. When called with a prefix
+argument, redisplay window with 1st text line of the current
+paragraph on 1st line of the window. If current paragraph is too
+large for this, do the same as if called without a prefix
+argument."
   (interactive "P")
   (save-excursion (backward-paragraph) (forward-line 1) (recenter 0)
 	        (setq LASTPOSPAR (save-excursion (forward-paragraph) (forward-line -1) (point)))
@@ -546,7 +576,8 @@ prefix argument is taken as COL. If prefix argument is non-nil, set
   (recenter 9))
 
 (defun my-recenter-paragrpah ()
-  "Redisplay window with 1st line of the paragraph on 1st line of the window."
+  "Redisplay window with 1st line of the paragraph on 1st line of
+the window."
   (interactive)
   (save-excursion
     (backward-paragraph)
@@ -559,13 +590,18 @@ prefix argument is taken as COL. If prefix argument is non-nil, set
   (revert-buffer nil t nil))
 
 (defun my-select-gnus-message-archive-group (sgrp)
-  "Function for returning the name of the Gnus group in which to archive outgoing messages, based on the name of the group from which the message was sent. See `gnus-message-archive-group' for details."
+  "Function for returning the name of the Gnus group in which to
+archive outgoing messages, based on the name of the group from
+which the message was sent. See `gnus-message-archive-group' for
+details."
   (if (string-match-p "^Bewerbung.*" sgrp)
       "Bewerbung.Ausgang"
     "Privat.Ausgang"))
 
 (defun my-set-message-signature ()
-  "Set variable `message-signature', depending on the name of the current buffer. This function is meant to be listed in `gnus-summary-mode-hook'."
+  "Set variable `message-signature', depending on the name of the
+current buffer. This function is meant to be listed in
+`gnus-summary-mode-hook'."
   ()
   (let ((match-data-old (match-data)))
     (setq message-signature
@@ -578,14 +614,19 @@ E-Mail: renke.vonseggern@gmx.de"))
     ))
 
 (defun my-sh-smie-sh-rules (origfun kind token)
-  "Custom function to correct indentation in shell scripts after `&&´. Taken from `http://superuser.com/questions/1037043/emacs-suppress-indent-after-in-shell-script-mode´."
+  "Custom function to correct indentation in shell scripts after
+`&&´. Taken from
+`http://superuser.com/questions/1037043/emacs-suppress-indent-after-in-shell-script-mode´."
   (pcase (cons kind token)
     (`(:before . "&&") nil)
     (_ (funcall origfun kind token))))
 (advice-add 'sh-smie-sh-rules :around #'my-sh-smie-sh-rules)
 
 (defun my-start-or-switch-to-R-process ()
-  "If no R process is running, call (R). If exactly one R process is running, switch to the corresponding process buffer. Otherwise, offer a selection of R process buffers and switch to the selected buffer."
+  "If no R process is running, call (R). If exactly one R process
+is running, switch to the corresponding process
+buffer. Otherwise, offer a selection of R process buffers and
+switch to the selected buffer."
   (interactive)
   (require 'ido)
   (require 'ess)
@@ -618,7 +659,9 @@ E-Mail: renke.vonseggern@gmx.de"))
       )))
 
 (defun my-string-match-list (LIST STRING)
-  "Match string STRING against the elements of list LIST (using `string-match'). Return t upon finding the first match, otherwise return nil."
+  "Match string STRING against the elements of list LIST (using
+`string-match'). Return t upon finding the first match, otherwise
+return nil."
   (if (not (listp LIST))
       (error "LIST must be a list object"))
   (if (not (stringp STRING))
@@ -631,7 +674,10 @@ E-Mail: renke.vonseggern@gmx.de"))
 	  (setq ELT (+ 1 ELT))))))
 
 (defun my-switch-windows (ARG)
-  "If exactly two vertically separated windows are displayed, switch the buffers in them. When called without a prefix argument, select the previously selected buffer. When called with a prefix argument, select the previously unselected buffer."
+  "If exactly two vertically separated windows are displayed,
+switch the buffers in them. When called without a prefix
+argument, select the previously selected buffer. When called with
+a prefix argument, select the previously unselected buffer."
   (interactive "P")
   (let (BUFFER_CURRENT)
     (if (= (length (window-list)) 2)
@@ -659,7 +705,10 @@ E-Mail: renke.vonseggern@gmx.de"))
       (message "There are more or less than two windows displayed."))))
 
 (defun my-visit-file-add-to-git-whitelist (&optional arg)
-  "If called with prefix argument ARG, prompt for git repository directory, otherwise use \"~/\" as default. Prompt for filename. If the file is accessible and not already mentioned in gitignore file, add filename to gitignore whitelist. Visit the file."
+  "If called with prefix argument ARG, prompt for git repository directory,   
+otherwise use \"~/\" as default. Prompt for filename. If the file is   
+accessible and not already mentioned in gitignore file, add filename to   
+gitignore whitelist. Visit the file."
   (interactive "P")
   (let (bl
         bl-start
@@ -812,22 +861,22 @@ E-Mail: renke.vonseggern@gmx.de"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun my-Emacs-Lisp-mode-bindings ()
-  "This function contains custom key bindings intended for use in Emacs-Lisp mode.
-The bindings are:
-C-c C-u    my-comment-or-uncomment"
+  "This function contains custom key bindings intended for use in
+Emacs-Lisp mode. The bindings are: C-c C-u
+my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-ESS_S_-mode-bindings ()
-  "This function contains custom key bindings intended for use in ESS[S] mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in ESS[S] 
+mode. The bindings are:
 C-c C-u    my-comment-or-uncomment
 C-c C-p    ess-eval-paragraph"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
   (local-set-key "\C-c\C-p" 'ess-eval-paragraph))
 
 (defun my-LaTeX/P-mode-bindings ()
-  "This function contains custom key bindings intended for use in LaTeX/P mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in LaTeX/P 
+mode. The bindings are:
 C-c C-u    my-comment-or-uncomment
 RET        reindent-then-newline-and-indent
 C-c C-y    my-delete-and-insert-blank-lines"
@@ -836,7 +885,8 @@ C-c C-y    my-delete-and-insert-blank-lines"
   (local-set-key "\C-c\C-y" 'my-delete-and-insert-blank-lines))
 
 (defun my-LaTeX/P-mode-symbol-additions ()
-  "This function uses `TeX-add-symbols´ to add symbols to the list of symbols known by AUCTeX in LaTeX/P mode.
+  "This function uses `TeX-add-symbols´ to add symbols to the list of symbols 
+known by AUCTeX in LaTeX/P mode.
 
 The symbols and their descriptions are:
 textcite  TeX-arg-cite
@@ -846,19 +896,19 @@ parencite TeX-arg-cite"
    '("parencite" TeX-arg-cite)))
 
 (defun my-Lisp-Interaction-mode-bindings ()
-  "This function contains custom key bindings intended for use in Lisp Interaction mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in Lisp 
+Interaction mode. The bindings are:
 C-c C-u    my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Octave-mode-bindings ()
-  "This function contains custom key bindings intended for use in Octave mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in Octave 
+mode. The bindings are:
 C-c C-u    my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Org-mode-bindings ()
-  "This function contains custom key bindings intended for use in Org mode.
+  "This function contains custom key bindings intended for use in Org mode. 
 The bindings are:
 RET        org-return-indent
 C-j        org-return"
@@ -866,13 +916,13 @@ C-j        org-return"
   (local-set-key "\C-j" 'org-return))
 
 (defun my-Python-mode-bindings ()
-  "This function contains custom key bindings intended for use in Python mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in Python 
+mode. The bindings are:
 C-c C-u    my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Shell-script-mode-bindings ()
-  "This function contains custom key bindings intended for use in Shell-script mode.
-The bindings are:
+  "This function contains custom key bindings intended for use in 
+Shell-script mode. The bindings are:
 C-c C-u    my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
