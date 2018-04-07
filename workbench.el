@@ -1,5 +1,5 @@
 (defun my-visit-file-add-to-git-whitelist (&optional arg)
-  "If called with prefix argument ARG, prompt for git repository directory, otherwise use \"~/\" as default. Prompt for filename. If the file is accessible and not already mentioned in gitignore file, ask for comment and add comment and negated filename to it. Visit the file."
+  "If called with prefix argument ARG, prompt for git repository directory, otherwise use \"~/\" as default. Prompt for filename. If the file is accessible and not already mentioned in gitignore file, add filename to gitignore whitelist. Visit the file."
   (interactive "P")
   (let (bl
         bl-start
