@@ -35,25 +35,20 @@
         ;; Ask for filename, store it in "flnm" and "flnm-for-visit".
         (setq flnm (read-file-name "Filename: " nil nil nil ""))
         (setq flnm-for-visit flnm)
-        ;; Ensure that if "flnm" names a directory it ends with "/".
-        (if (file-directory-p flnm)
-	  (if (not (string= "/" (substring flnm -1)))
-	      (setq flnm (concat flnm "/"))))
-        ;; If "flnm" is a directory, ensure it is correctly formatted for usage in whitelist.
-        (if (file-directory-p flnm)
-	  (progn
-	    ;; Ensure that "flnm" does not start with a "/".
-	    (if (string= "/" (substring flnm 0 1))
-	        (setq flnm (substring flnm 1)))
-	    ;; Ensure that "flnm" ends with "/**".
-	    (setq flnm (concat flnm (if (string= "/" (substring flnm -1))
-				  "**"
-				"/**")))))
         ;; Store expansion of "flnm" in "flnmexp".
-        (setq flnmexp (expand-file-name flnm))
+        (setq flnmexp (expand-file-name flnm (file-name-directory flnm)))
         ;; Ensure that the file is actually trackable by the git repository.
         (if (not (string-match-p (regexp-quote (expand-file-name git-repo-dir)) flnmexp))
-	  (error (concat "File " flnm " not trackable by Git repository " git-repo-dir)))
+	  (error "File %s cannot be tracked by Git repository %s" flnm git-repo-dir))
+        ;; If "flnm" is a directory, ensure that it and "flnmexp" are correctly formatted for usage in gitignore file.
+        (if (file-directory-p flnm)
+	  (progn
+	    ;; Remove leading "/".
+	    (if (string= "/" (substring flnm 0 1)) (setq flnm (substring flnm 1)))
+	    (if (string= "/" (substring flnmexp 0 1)) (setq flnmexp (substring flnmexp 1)))
+	    ;; Append "/**".
+	    (setq flnm (concat (file-name-as-directory flnm) "**"))
+	    (setq flnmexp (concat (file-name-as-directory flnmexp) "**"))))
         ;; Store directory component of "flnm" and "flnmexp" in "dir" and "direxp", respectively, while ensuring that both end with "/".
         (setq dir (file-name-directory flnm))
         (if (not (string= "/" (substring dir -1)))
@@ -68,16 +63,16 @@
         (add-face-text-property 0 (length gitigflnm) '(:foreground "blue") t gitigflnm)
         ;; Check whether "flnm" and "dir" are accessible/readable/writable, stop if not.
         (if (not (file-accessible-directory-p (file-name-directory flnm)))
-	  (throw 'outer (message "Directory %s is not accessible." dir)))
+	  (error "Directory %s is not accessible." dir))
         (if (and (file-exists-p flnm) (not (file-readable-p flnm)))
-	  (throw 'outer (message "File %s is not readable." flnm)))
+	  (error "File %s is not readable." flnm))
         (if (and (file-exists-p flnm) (not (file-writable-p flnm)))
-	  (throw 'outer (message "File %s is not writable." flnm)))
+	  (error "File %s is not writable." flnm))
         ;; Check whether file "gitigflnmexp" is readable/writable, stop if not.
         (if (and (file-exists-p gitigflnmexp) (not (file-readable-p gitigflnmexp)))
-	  (throw 'outer (message "File %s is not readable." gitigflnm)))
+	  (error "File %s is not readable." gitigflnm))
         (if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
-	  (throw 'outer (message "File %s is not writable." gitigflnm)))
+	  (error "File %s is not writable." gitigflnm))
         ;; Remove the provided Git repo directory or its expansion from the beginning of "dir", "direxp", "flnm", and "flnmexp".
         (setq dir (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" dir))
         (setq direxp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" direxp))
@@ -121,6 +116,8 @@
 	;; Check whether the supplied filename (or its expanded equivalent) is already present in either the black- or the whitelist. If yes, inform about it and skip ahead to visiting the file.
 	(if (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))
 	    (throw 'inner (message "Filename %s or its expansion is already present in black- or whitelist in %s." flnm gitigflnm)))
+	;; Remove text properties from "flnm".
+	(set-text-properties 0 (length flnm) nil flnm)
 	;; If applicable, create a descending list of directories from the path of "flnm".
 	(if (file-name-directory flnm)
 	    (progn
@@ -128,6 +125,16 @@
 	      (setq dirs-list (mapcar (lambda (elt)
 				  (setq dir-tmp (concat dir-tmp elt "/")))
 				dirs-list))))
+	;; BEGIN TESTING
+	)))
+	;; (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
+	;; (display-message-or-buffer (prin1-to-string (string-match-p (regexp-quote (expand-file-name git-repo-dir)) flnmexp)))
+	;; (display-message-or-buffer (prin1-to-string flnm))
+	;; (display-message-or-buffer (prin1-to-string flnmexp))
+	;; (expand-file-name flnm (file-name-directory flnm))
+	;; (file-name-directory flnm)
+	))
+;; END TESTING
 	;; Ask for a comment.
 	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
 	;; Throw error if comment is empty.
@@ -145,13 +152,7 @@
 	(if (= (point) (point-max))
 	    (insert "\n")
 	  (end-of-line)
-	  (insert "\n\n"))
-	;; Remove text properties from "flnm".
-	(set-text-properties 0 (length flnm) nil flnm))))
-    ;; BEGIN TESTING
-    (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
-    ))
-;; END TESTING
+	  (insert "\n\n")))))
 	;; TODO: add mechanism for ensuring the whitelist to be lexicographically ordered 
 	;; Append comment, negated "flnm" and trailing newline to "gitigbuf".
 	(insert cmmnt "\n" "!" flnm "\n")
@@ -159,7 +160,7 @@
 	(save-buffer)
 	;; If "gitigbuf" is not a member of "curbuflst", kill "gitigbuf".
 	(if (not (member gitigbuf curbuflst))
-	    (kill-buffer gitigbuf))))
+	    (kill-buffer gitigbuf))
       ;; Visit the specified file.
       (find-file flnm-for-visit))))
 
