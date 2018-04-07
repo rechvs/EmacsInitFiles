@@ -4,10 +4,8 @@
   (let (bl
         bl-start
         bl-end
-        cmmnt
         curbuflst
         dir
-        direxp
         dirs-list
         (dir-tmp "")
         flnm
@@ -50,13 +48,10 @@
 	      ;; Append "/**".
 	      (setq flnm (concat (file-name-as-directory flnm) "**"))
 	      (setq flnmexp (concat (file-name-as-directory flnmexp) "**"))))
-	;; Store directory component of "flnm" and "flnmexp" in "dir" and "direxp", respectively, while ensuring that both end with "/".
+	;; Store directory component of "flnm" in "dir", while ensuring that both end with "/".
 	(setq dir (file-name-directory flnm))
 	(if (not (string= "/" (substring dir -1)))
 	    (setq dir (concat dir "/")))
-	(setq direxp (file-name-directory flnmexp))
-	(if (not (string= "/" (substring direxp -1)))
-	    (setq direxp (concat direxp "/")))
 	;; Add text properties to strings for pretty printing.
 	(add-face-text-property 0 (length dir) '(:foreground "blue") t dir)
 	(add-face-text-property 0 (length flnm) '(:foreground "blue") t flnm)
@@ -74,9 +69,8 @@
 	    (error "File %s is not readable." gitigflnm))
 	(if (and (file-exists-p gitigflnmexp) (not (file-writable-p gitigflnmexp)))
 	    (error "File %s is not writable." gitigflnm))
-	;; Remove the provided Git repo directory or its expansion from the beginning of "dir", "direxp", "flnm", and "flnmexp".
+	;; Remove the provided Git repo directory or its expansion from the beginning of "dir", "flnm", and "flnmexp".
 	(setq dir (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" dir))
-	(setq direxp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" direxp))
 	(setq flnm (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnm))
 	(setq flnmexp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnmexp))
 	(save-excursion
