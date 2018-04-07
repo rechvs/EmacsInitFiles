@@ -121,11 +121,13 @@
 	;; Check whether the supplied filename (or its expanded equivalent) is already present in either the black- or the whitelist. If yes, inform about it and skip ahead to visiting the file.
 	(if (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))
 	    (throw 'inner (message "Filename %s or its expansion is already present in black- or whitelist in %s." flnm gitigflnm)))
-	;; Create a  list of parent directories from the path of "flnm".
-	(setq dirs-list (delete "" (split-string (file-name-directory (replace-regexp-in-string git-repo-dir "" flnm)) "/")))
-	(setq dirs-list (mapcar (lambda (elt)
-			      (setq dir-tmp (concat dir-tmp elt "/")))
-			    dirs-list))
+	;; If applicable, create a descending list of directories from the path of "flnm".
+	(if (file-name-directory flnm)
+	    (progn
+	      (setq dirs-list (delete "" (split-string (file-name-directory flnm) "/")))
+	      (setq dirs-list (mapcar (lambda (elt)
+				  (setq dir-tmp (concat dir-tmp elt "/")))
+				dirs-list))))
 	;; Ask for a comment.
 	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
 	;; Throw error if comment is empty.
@@ -147,7 +149,7 @@
 	;; Remove text properties from "flnm".
 	(set-text-properties 0 (length flnm) nil flnm))))
     ;; BEGIN TESTING
-    ;; (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
+    (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
     ))
 ;; END TESTING
 	;; TODO: add mechanism for ensuring the whitelist to be lexicographically ordered 
