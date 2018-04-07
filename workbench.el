@@ -125,44 +125,27 @@
 	      (setq dirs-list (mapcar (lambda (elt)
 				  (setq dir-tmp (concat dir-tmp elt "/")))
 				dirs-list))))
-	;; BEGIN TESTING
-	)))
-	;; (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
-	;; (display-message-or-buffer (prin1-to-string (string-match-p (regexp-quote (expand-file-name git-repo-dir)) flnmexp)))
-	;; (display-message-or-buffer (prin1-to-string flnm))
-	;; (display-message-or-buffer (prin1-to-string flnmexp))
-	;; (expand-file-name flnm (file-name-directory flnm))
-	;; (file-name-directory flnm)
-	))
-;; END TESTING
-	;; Ask for a comment.
-	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
-	;; Throw error if comment is empty.
-	(if (string= "" cmmnt)
-	    (error "Empty comment"))
-	;; Trim comment of leading and trailing whitespace.
-	(setq cmmnt (replace-regexp-in-string "^[ ]+" "" cmmnt))
-	(setq cmmnt (replace-regexp-in-string "[ ]+$" "" cmmnt))
-	;; If necessary, prepend "# " to the comment.
-	(if (not (string-equal "#" (substring cmmnt 0 1)))
-	    (setq cmmnt (concat "# " cmmnt)))
-	;; If necessary, append a newline to "gitigbuf" (before appending the comment).
-	(goto-char (point-max))
-	(beginning-of-line)
-	(if (= (point) (point-max))
-	    (insert "\n")
-	  (end-of-line)
-	  (insert "\n\n")))))
-	;; TODO: add mechanism for ensuring the whitelist to be lexicographically ordered 
-	;; Append comment, negated "flnm" and trailing newline to "gitigbuf".
-	(insert cmmnt "\n" "!" flnm "\n")
-	;; Save "gitigbuf".
-	(save-buffer)
-	;; If "gitigbuf" is not a member of "curbuflst", kill "gitigbuf".
-	(if (not (member gitigbuf curbuflst))
-	    (kill-buffer gitigbuf))
-      ;; Visit the specified file.
-      (find-file flnm-for-visit))))
+	;; Create new whitelist.
+	(setq wl (sort (delete-dups (cl-union (cl-union (list (concat "!" flnm)) (mapcar (lambda (elt) (concat "!" elt)) dirs-list)) wl)) 'string<))
+	;; Replace whitelist in "gitigbuf" with new one.
+	(setq format-string (apply 'concat (make-list (length wl) "%s\n")))
+	(setq format-string (substring format-string 0 -1))
+	(delete-region wl-start wl-end)
+	(goto-char wl-start)
+	(insert (apply 'format format-string wl))))
+      ;; Save "gitigbuf".
+      (save-buffer)
+      ;; If "gitigbuf" is not a member of "curbuflst", kill "gitigbuf".
+      (if (not (member gitigbuf curbuflst))
+	(kill-buffer gitigbuf)))
+    ;; Visit the specified file.
+    (find-file flnm-for-visit)))
+      
+      ;; BEGIN TESTING
+      ;; (display-message-or-buffer (prin1-to-string wl))
+      ;; ))
+      )))
+      ;; END TESTING
 
 
 (let (dir
