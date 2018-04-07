@@ -8,6 +8,8 @@
         curbuflst
         dir
         direxp
+        dirs-list
+        (dir-tmp "")
         file-is-dir
         flnm
         flnm-for-visit
@@ -36,7 +38,7 @@
         ;; Ensure that if "flnm" names a directory it ends with "/".
         (if (file-directory-p flnm)
 	  (if (not (string= "/" (substring flnm -1)))
-	  (setq flnm (concat flnm "/"))))
+	      (setq flnm (concat flnm "/"))))
         ;; current buffer is visiting file => visited file is default
         (setq flnm-for-visit flnm)
         ;; Check whether the specified file is a directory.
@@ -92,7 +94,6 @@
 	      (setq bl-end (point))))
 	(if (and bl-start bl-end (< bl-start bl-end))
 	    (setq bl (delete "" (split-string (buffer-substring-no-properties bl-start bl-end) "\n"))))
-	;; TODO: remove commented entries from blacklist
 	;; Check blacklist for consistency.
 	(if (memq t (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) bl))
 	    (error "Blacklist in %s inconsistent" gitigflnm))
@@ -108,32 +109,22 @@
 	      (setq wl-end (point))))
 	(if (and wl-start wl-end (< wl-start wl-end))
 	    (setq wl (delete "" (split-string (buffer-substring-no-properties wl-start wl-end) "\n"))))
-	;; TODO: remove commented entries from whitelist
 	;; Check whitelist for consistency.
 	(if (memq nil (mapcar (lambda (elt) (string= "!" (substring elt 0 1))) wl))
 	    (error "Whitelist in %s inconsistent" gitigflnm))
 	;; Check whether the supplied filename (or its expanded equivalent) is already present in either the black- or the whitelist. If yes, inform about it and skip ahead to visiting the file.
 	(if (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))
 	    (throw 'inner (message "Filename %s or its expansion is already present in black- or whitelist in %s." flnm gitigflnm)))
-	;; TODO: add mechanism for whitelisting "dir" (i.e., the path component of "flnm") without whitelisting the same directory twice (solution: create an Elisp list from the whitelist, then apply "(delete-dups ...)" to it
-	;; BEGIN TESTING
-	;; (setq test (mapcar (lambda (elt)
-	;; (set-text-properties 0 (length elt) nil elt)
-	;; elt)
-	;; (display-message-or-buffer (prin1-to-string (list dir direxp flnm flnmexp)))
-	;; (display-message-or-buffer (prin1-to-string test))
-	;; (display-message-or-buffer (prin1-to-string bl))
-	;; (display-message-or-buffer (prin1-to-string wl))
-	;; (display-message-or-buffer (prin1-to-string (length wl)))
-	;; (display-message-or-buffer (prin1-to-string (memq nil (list (not (member flnm bl)) (not (member flnmexp bl)) (not (member (concat "!" flnm) wl)) (not (member (concat "!" flnmexp) wl))))))
-	;; (display-message-or-buffer (prin1-to-string flnm))
-	;; (display-message-or-buffer (prin1-to-string bl))
-	;; (display-message-or-buffer (prin1-to-string (member flnm bl)))
-	(display-message-or-buffer (prin1-to-string (list flnm bl)))
-	)))))
-;; END TESTING
+	;; Create a  list of parent directories from the path of "flnm".
+	(setq dirs-list (delete "" (split-string (file-name-directory (replace-regexp-in-string git-repo-dir "" flnm)) "/")))
+	(setq dirs-list (mapcar (lambda (elt)
+			      (setq dir-tmp (concat dir-tmp elt "/")))
+			    dirs-list))
 	;; Ask for a comment.
 	(setq cmmnt (read-string "Comment (comment character may be omitted): "))
+	;; Throw error if comment is empty.
+	(if (string= "" cmmnt)
+	    (error "Empty comment"))
 	;; Trim comment of leading and trailing whitespace.
 	(setq cmmnt (replace-regexp-in-string "^[ ]+" "" cmmnt))
 	(setq cmmnt (replace-regexp-in-string "[ ]+$" "" cmmnt))
@@ -149,7 +140,6 @@
 	  (insert "\n\n"))
 	;; Remove text properties from "flnm".
 	(set-text-properties 0 (length flnm) nil flnm)
-
 	;; TODO: check whether the specified file is a directory (because (recursively) whitelisting a directory requires different syntax than whitelisting a single file) 
 	(if file-is-dir
 	    (progn
@@ -157,13 +147,13 @@
 	      (if (string= "/" (substring flnm 0 1))
 		(setq flnm (substring flnm 1)))
 	      ;; Ensure that "flnm" ends with "/**".
-	      (setq flnm (concat (if (string= "/" (substring flnm -1))
-			         "**"
-			       "/**")))
-			         
-			         ;; CONTINUE HERE
-			         )))))
-
+	      (setq flnm (concat flnm (if (string= "/" (substring flnm -1))
+				    "**"
+				  "/**"))))))))
+    ;; BEGIN TESTING
+    (display-message-or-buffer (prin1-to-string (sort (cl-union dirs-list (list flnm)) 'string<)))
+    ))
+;; END TESTING
 	;; TODO: add mechanism for ensuring the whitelist to be lexicographically ordered 
 	;; Append comment, negated "flnm" and trailing newline to "gitigbuf".
 	(insert cmmnt "\n" "!" flnm "\n")
