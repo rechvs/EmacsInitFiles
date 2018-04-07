@@ -18,6 +18,7 @@
         gitigflnmexp
         git-repo-dir
         (home-dir-path "~/")
+        (match-data-old (match-data))
         wl
         wl-start
         wl-end)
@@ -33,7 +34,7 @@
 	;; Store expansion of "gitigflnm" in "gitigflnmexp".
 	(setq gitigflnmexp (expand-file-name gitigflnm))
 	;; Ask for filename, store it in "flnm" and "flnm-for-visit".
-	(setq flnm (read-file-name "Filename: " nil nil nil ""))
+	(setq flnm (read-file-name "Filename: " nil nil 'confirm ""))
 	(setq flnm-for-visit flnm)
 	;; Store expansion of "flnm" in "flnmexp".
 	(setq flnmexp (expand-file-name flnm (file-name-directory flnm)))
@@ -78,8 +79,8 @@
 	(setq direxp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" direxp))
 	(setq flnm (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnm))
 	(setq flnmexp (replace-regexp-in-string (concat "\\(^" git-repo-dir "\\)\\|\\(^" (expand-file-name git-repo-dir) "\\)") "" flnmexp))
-	;; Visit "gitigflnmexp" and store the resulting buffer in "gitigbuf".
 	(save-excursion
+	  ;; Visit "gitigflnmexp" and store the resulting buffer in "gitigbuf".
 	  (setq gitigbuf (find-file-noselect gitigflnmexp))
 	  ;; Make "gitigbuf" the current buffer.
 	  (set-buffer gitigbuf)
@@ -142,34 +143,9 @@
 	  (insert (apply 'format format-string wl))
 	  ;; Save "gitigbuf".
 	  (save-buffer)))
-      ;; If "gitigbuf" is not a member of "curbuflst", kill "gitigbuf".
-      (if (not (member gitigbuf curbuflst))
-	(kill-buffer gitigbuf)))
+      ;; If "gitigbuf" is non-nil and not a member of "curbuflst", kill "gitigbuf".
+      (if (and gitigbuf (not (member gitigbuf curbuflst)))
+	(kill-buffer gitigbuf))
+      (set-match-data match-data-old))
     ;; Visit the specified file.
     (find-file flnm-for-visit)))
-      
-      ;; BEGIN TESTING
-      ;; (display-message-or-buffer (prin1-to-string wl))
-      ;; ))
-      )))
-      ;; END TESTING
-
-
-(let (dir
-      dirs-list
-      (dirs-negated "!")
-      (flnm "~/Mail/Privat/Eingang/1")
-      (format-string "")
-      (git-project-dir "~/"))
-  (setq dirs-list (delq "" (split-string (file-name-directory (replace-regexp-in-string git-project-dir "" flnm)) "/")))
-  (setq dirs-negated (mapcar (lambda (elt)
-			      (setq dirs-negated (concat dirs-negated elt "/")))
-			    dirs-list))
-  (setq format-string (apply 'concat (make-list (length dirs-negated) "%s\n")))
-  (setq format-string (substring format-string 0 -1))
-  ;; (setq format-string (concat (substring format-string 0 -1) "**"))
-  (setq dirs-negated (apply 'format format-string dirs-negated))
-  ;; TESTING
-  ;; dirs-negated
-  ;; TESTING
-  )
