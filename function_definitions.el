@@ -473,11 +473,11 @@ string1)
   (set-match-data match-data-old))))
 
 (defun my-move-beginning-of-line ()
-  "If point is not at the end of text matching 
-`my-move-beginning-of-line-skip-regexp' (anchored at beginning of current 
-line), move point there. Otherwise, move point to beginning of current line. 
-\"Line\" here means either the visual or the logical line, depending on 
-whether `visual-line-mode' is non-nil or nil."
+  "If point is not at the end of text matching
+`my-move-beginning-of-line-skip-regexp', move point
+there. Otherwise, move point to beginning of current
+line. \"Line\" here means either the visual or the logical line,
+depending on whether `visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
          (bol (save-excursion (if visual-line-mode (beginning-of-visual-line) (beginning-of-line)) (point)))
@@ -490,10 +490,10 @@ whether `visual-line-mode' is non-nil or nil."
       (set-match-data match-data-old))))
 
 (defun my-move-end-of-line ()
-  "If point is not at the beginning of text matching 
-`my-move-end-of-line-skip-regexp' (terminated at end of current line), move 
-point there. Otherwise, move point to end of current line. \"Line\" here 
-means either the visual or the logical line, depending on whether 
+  "If point is not at the beginning of text matching
+`my-move-end-of-line-skip-regexp', move point there. Otherwise,
+move point to end of current line. \"Line\" here means either the
+visual or the logical line, depending on whether
 `visual-line-mode' is non-nil or nil."
   (interactive)
   (let* ((match-data-old (match-data))
@@ -911,9 +911,13 @@ C-c C-u    my-comment-or-uncomment"
   "This function contains custom key bindings intended for use in Org mode. 
 The bindings are:
 RET        org-return-indent
-C-j        org-return"
+C-j        org-return
+M-m        my-move-beginning-of-line
+M-p        my-move-end-of-line"
   (local-set-key "\r" 'org-return-indent)
-  (local-set-key "\C-j" 'org-return))
+  (local-set-key "\C-j" 'org-return)
+  (local-set-key "\M-m" 'my-move-beginning-of-line)
+  (local-set-key "\M-p" 'my-move-end-of-line))
 
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
