@@ -40,6 +40,7 @@
 (add-hook 'python-mode-hook 'my-Python-mode-bindings)
 
 (add-hook 'org-mode-hook 'my-Org-mode-bindings)
+(add-hook 'org-mode-hook '(lambda () (setq my-move-beginning-of-line-skip-regexp "^\\(\\*+ +\\| +[+-] \\[[ X-]\\] \\| +[+-] \\| +[0-9]+\\. \\[[ X-]\\] \\| +[0-9]+\\. \\| +\\)")))
 
 (add-hook 'sh-mode-hook 'my-Shell-script-mode-bindings)
 
