@@ -10,6 +10,6 @@
 (add-to-list  'mm-inhibit-file-name-handlers 'openwith-file-handler)
 
 (add-to-list 'package-archives
-	   '("melpa" . "https://melpa.org/packages/"))
+             '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives
-	   '("org" . "https://orgmode.org/elpa/"))
+             '("org" . "https://orgmode.org/elpa/"))
