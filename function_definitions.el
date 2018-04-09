@@ -911,13 +911,17 @@ C-c C-u    my-comment-or-uncomment"
   "This function contains custom key bindings intended for use in Org mode. 
 The bindings are:
 RET        org-return-indent
+C-a        my-move-beginning-of-line
+C-e        my-move-end-of-line
 C-j        org-return
-M-m        my-move-beginning-of-line
-M-p        my-move-end-of-line"
+M-m        org-beginning-of-line
+M-p        org-end-of-line"
   (local-set-key "\r" 'org-return-indent)
+  (local-set-key "\C-a" 'my-move-beginning-of-line)
+  (local-set-key "\C-e" 'my-move-end-of-line)
   (local-set-key "\C-j" 'org-return)
-  (local-set-key "\M-m" 'my-move-beginning-of-line)
-  (local-set-key "\M-p" 'my-move-end-of-line))
+  (local-set-key "\M-m" 'org-beginning-of-line)
+  (local-set-key "\M-p" 'org-end-of-line))
 
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
