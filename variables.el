@@ -92,13 +92,13 @@
   "Regexp covering all sections known to man.")
 
 (defcustom my-move-beginning-of-line-skip-regexp
-  "[    ]+"
+  "[ 	]+"
   "See `my-move-beginning-of-line'."
   :type '(regexp))
 (make-variable-buffer-local 'my-move-beginning-of-line-skip-regexp)
 
 (defcustom my-move-end-of-line-skip-regexp
-  "[      ]+"
+  "[ 	]+"
   "See `my-move-end-of-line'."
   :type '(regexp))
 (make-variable-buffer-local 'my-move-end-of-line-skip-regexp)
