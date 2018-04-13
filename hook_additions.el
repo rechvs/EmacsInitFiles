@@ -18,6 +18,7 @@
 
 (add-hook 'gnus-group-mode-hook 'hl-line-mode)
 (add-hook 'gnus-summary-mode-hook 'hl-line-mode)
+(add-hook 'gnus-summary-mode-hook '(lambda () (setq my-move-beginning-of-line-skip-regexp "[A ]+([MDFSoira, 0-9:-]*)")))
 (add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-bindings)
 (add-hook 'gnus-summary-mode-hook 'my-set-message-signature)
 
