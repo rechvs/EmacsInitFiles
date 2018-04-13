@@ -874,6 +874,11 @@ C-c C-p    ess-eval-paragraph"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
   (local-set-key "\C-c\C-p" 'ess-eval-paragraph))
 
+(defun my-gnus-summary-mode-bindings ()
+  "This function contains custom key bindings intended for use in Gnus Summary mode. The bindings are:
+C-d    gnus-summary-delete-article"
+  (local-set-key (kbd "C-d") 'gnus-summary-delete-article))
+
 (defun my-LaTeX/P-mode-bindings ()
   "This function contains custom key bindings intended for use in LaTeX/P 
 mode. The bindings are:
