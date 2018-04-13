@@ -18,6 +18,7 @@
 
 (add-hook 'gnus-group-mode-hook 'hl-line-mode)
 (add-hook 'gnus-summary-mode-hook 'hl-line-mode)
+(add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-bindings)
 (add-hook 'gnus-summary-mode-hook 'my-set-message-signature)
 
 (add-hook 'LaTeX-mode-hook '(lambda () (setq my-move-end-of-line-skip-regexp "\\([ 	]+%+.*\\)\\|\\([ 	]+\\)")))
