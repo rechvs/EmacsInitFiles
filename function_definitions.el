@@ -862,8 +862,8 @@ gitignore whitelist. Visit the file."
 
 (defun my-Emacs-Lisp-mode-bindings ()
   "This function contains custom key bindings intended for use in
-Emacs-Lisp mode. The bindings are: C-c C-u
-my-comment-or-uncomment"
+Emacs-Lisp mode. The bindings are: 
+C-c C-u    my-comment-or-uncomment"
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-ESS_S_-mode-bindings ()
@@ -930,8 +930,10 @@ M-p        org-end-of-line"
 
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
-mode. The bindings are:
+mode. The bindings are: 
+C-c C-l    elpy-shell-send-statement
 C-c C-u    my-comment-or-uncomment"
+  (local-set-key (kbd "C-c C-l") 'elpy-shell-send-statement)
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Shell-script-mode-bindings ()
