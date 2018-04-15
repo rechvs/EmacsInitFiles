@@ -134,6 +134,14 @@ If point is not on a blank line do nothing."
                (forward-line (- (/ ARG 2) 1))))))
       (message "Current line is not blank\."))))
 
+(defun my-elpy-shell-send-line (&optional arg)
+  "Send the current line to the Python shell. Without prefix argument ARG, move point to beginning of next line."
+  (interactive "P")
+  (elpy-shell--ensure-shell-running)
+  (python-shell-send-string (buffer-substring-no-properties (line-beginning-position) (line-end-position))) 
+  (if (not arg)
+      (forward-line)))
+
 (defun my-find-region-or-at-point ()
   "If region is active, use text in region as the filename to visit.
 Otherwise use the text at point as the filename to visit. The
@@ -930,10 +938,10 @@ M-p        org-end-of-line"
 
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
-mode. The bindings are: 
-C-c C-l    elpy-shell-send-statement
+mode. The bindings are:
+C-c C-l    my-elpy-shell-send-line
 C-c C-u    my-comment-or-uncomment"
-  (local-set-key (kbd "C-c C-l") 'elpy-shell-send-statement)
+  (local-set-key (kbd "C-c C-l") 'my-elpy-shell-send-line)
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
 
 (defun my-Shell-script-mode-bindings ()
