@@ -12,6 +12,8 @@
 (add-hook 'dired-mode-hook 'hl-line-mode)
 (add-hook 'dired-mode-hook 'my-customize-interface)
 
+(add-hook 'elpy-mode-hook 'my-Elpy-mode-bindings)
+
 (add-hook 'emacs-lisp-mode-hook 'my-Emacs-Lisp-mode-bindings)
 
 (add-hook 'ess-mode-hook 'my-ESS_S_-mode-bindings)
