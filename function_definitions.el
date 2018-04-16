@@ -939,10 +939,15 @@ M-p        org-end-of-line"
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
 mode. The bindings are:
-C-c C-n    my-elpy-shell-send-line
 C-c C-u    my-comment-or-uncomment"
-  (local-set-key (kbd "C-c C-n") 'my-elpy-shell-send-line)
   (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
+
+(defun my-Elpy-mode-bindings ()
+  "This function contains custom key bindings intended for use in Elpy 
+mode. The bindings are:
+C-c C-n    my-elpy-shell-send-line"
+  (define-key elpy-mode-map (kbd "C-c C-n")
+    'my-elpy-shell-send-line))
 
 (defun my-Shell-script-mode-bindings ()
   "This function contains custom key bindings intended for use in 
