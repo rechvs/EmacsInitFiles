@@ -135,12 +135,15 @@ If point is not on a blank line do nothing."
       (message "Current line is not blank\."))))
 
 (defun my-elpy-shell-send-line (&optional arg)
-  "Send the current line to the Python shell. Without prefix argument ARG, move point to beginning of next line."
+  "Send the current line to the Python shell. Without prefix argument ARG, move point to beginning of next (non-empty) line."
   (interactive "P")
   (elpy-shell--ensure-shell-running)
   (python-shell-send-string (buffer-substring-no-properties (line-beginning-position) (line-end-position))) 
   (if (not arg)
-      (forward-line)))
+      (let ((match-data-old (match-data)))
+        (end-of-line)
+        (or (re-search-forward "^[^]" (point-max) t) (forward-line))
+        (set-match-data match-data-old))))
 
 (defun my-find-region-or-at-point ()
   "If region is active, use text in region as the filename to visit.
