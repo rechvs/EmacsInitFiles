@@ -141,8 +141,9 @@ If point is not on a blank line do nothing."
   (python-shell-send-string (buffer-substring-no-properties (line-beginning-position) (line-end-position))) 
   (if (not arg)
       (let ((match-data-old (match-data)))
-        (end-of-line)
-        (or (re-search-forward "^[^]" (point-max) t) (forward-line))
+        (forward-line)
+        (while (looking-at "^
+") (forward-line))
         (set-match-data match-data-old))))
 
 (defun my-find-region-or-at-point ()
