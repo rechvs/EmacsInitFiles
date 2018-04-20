@@ -2,6 +2,43 @@
 ;; Miscellaneous functions ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun gnus-user-format-function-a (hdr)
+  "If HDR is not a vector, return the string \"void\". Otherwise,
+if one of my addresses is contained in either the To: or the
+Cc: header or if both these headers are empty, return the From:
+header; else return the To: header or, if that is empty, the
+Cc: header. In all cases, prefer the full name contained in the
+header if present, otherwise use only the email address. See
+`gnus-summary-line-format' on how this function interfaces with
+Gnus."
+  (if (not (vectorp hdr))
+      "void"
+    (let ((from (mail-extract-address-components (mail-header-from hdr)))
+          (to (cdr (assoc 'To (mail-header-extra hdr))))
+          (cc (cdr (assoc 'Cc (mail-header-extra hdr))))
+          (ingorable-adresses-regexp "\\(\\(magic_willebinski\\)\\|\\(members\\)\\|\\(renke.vonseggern\\)\\)@gmx\\.\\(\\(de\\)\\|\\(net\\)\\)"))
+      (if (or (and (or (string= "" to) (null to))
+                   (or (string= "" cc) (null cc)))
+              (string-match-p ingorable-adresses-regexp (if (null to) "" to))
+              (string-match-p ingorable-adresses-regexp (if (null cc) "" cc)))
+          (progn
+            (setq from (if (null (nth 0 from))
+                           (nth 1 from)
+                         (nth 0 from)))
+            from)
+        (setq to (mail-extract-address-components to))
+        (setq to (if (null (nth 0 to))
+                     (nth 1 to)
+                   (nth 0 to)))
+        (if (null to)
+            (progn
+              (setq cc (mail-extract-address-components cc))
+              (setq cc (if (null (nth 0 cc))
+                           (nth 1 cc)
+                         (nth 0 cc)))
+              cc)
+          to)))))
+
 (defun my-abbrev-mode-on ()
   "Turn abbrev mode ON."
   (abbrev-mode 1))
@@ -200,42 +237,16 @@ separated windows and activate follow-mode."
      (split-window-horizontally)
      (follow-mode t))))
 
-(defun gnus-user-format-function-a (hdr)
-  "If HDR is not a vector, return the string \"void\". Otherwise,
-if one of my addresses is contained in either the To: or the
-Cc: header or if both these headers are empty, return the From:
-header; else return the To: header or, if that is empty, the
-Cc: header. In all cases, prefer the full name contained in the
-header if present, otherwise use only the email address. See
-`gnus-summary-line-format' on how this function interfaces with
-Gnus."
-  (if (not (vectorp hdr))
-      "void"
-    (let ((from (mail-extract-address-components (mail-header-from hdr)))
-          (to (cdr (assoc 'To (mail-header-extra hdr))))
-          (cc (cdr (assoc 'Cc (mail-header-extra hdr))))
-          (ingorable-adresses-regexp "\\(\\(magic_willebinski\\)\\|\\(members\\)\\|\\(renke.vonseggern\\)\\)@gmx\\.\\(\\(de\\)\\|\\(net\\)\\)"))
-      (if (or (and (or (string= "" to) (null to))
-                   (or (string= "" cc) (null cc)))
-              (string-match-p ingorable-adresses-regexp (if (null to) "" to))
-              (string-match-p ingorable-adresses-regexp (if (null cc) "" cc)))
-          (progn
-            (setq from (if (null (nth 0 from))
-                           (nth 1 from)
-                         (nth 0 from)))
-            from)
-        (setq to (mail-extract-address-components to))
-        (setq to (if (null (nth 0 to))
-                     (nth 1 to)
-                   (nth 0 to)))
-        (if (null to)
-            (progn
-              (setq cc (mail-extract-address-components cc))
-              (setq cc (if (null (nth 0 cc))
-                           (nth 1 cc)
-                         (nth 0 cc)))
-              cc)
-          to)))))
+(defun my-goto-last-relevant-python-line ()
+  "Move point to last relevant line of Python code above current line. Usually this means to skip over all preceding empty lines (including whitespace-only lines), unless an empty line is preceded by an indented non-empty line."
+  (interactive)
+  (let ((match-data-old (match-data)))
+    (unwind-protect
+        (progn
+          (forward-line -1)
+          (while (and (looking-at "^[ \t]*\n") (save-excursion (forward-line -1) (not (looking-at "^[ \t]+[^\n]"))))
+          (forward-line -1)))
+      (set-match-data match-data-old))))
 
 (defun my-hiwi-ssh-bayeos ()
   "Visit directory `/home/aknohl´ on host `134.76.19.50 ´ as user `aknohl´ via
