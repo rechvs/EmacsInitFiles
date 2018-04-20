@@ -238,7 +238,10 @@ separated windows and activate follow-mode."
      (follow-mode t))))
 
 (defun my-goto-last-relevant-python-line ()
-  "Move point to last relevant line of Python code above current line. Usually this means to skip over all preceding empty lines (including whitespace-only lines), unless an empty line is preceded by an indented non-empty line."
+  "Move point to last relevant line of Python code above current line. 
+Usually this means to skip over all preceding empty lines (including 
+whitespace-only lines), unless an empty line is preceded by an indented 
+non-empty line."
   (interactive)
   (let ((match-data-old (match-data)))
     (unwind-protect
@@ -960,9 +963,12 @@ C-c C-u    my-comment-or-uncomment"
 (defun my-Elpy-mode-bindings ()
   "This function contains custom key bindings intended for use in Elpy 
 mode. The bindings are:
-C-c C-n    my-elpy-shell-send-line"
+C-c C-n    my-elpy-shell-send-line
+C-c C-p    my-goto-last-relevant-python-line"
   (define-key elpy-mode-map (kbd "C-c C-n")
-    'my-elpy-shell-send-line))
+    'my-elpy-shell-send-line)
+  (define-key elpy-mode-map (kbd "C-c C-p")
+    'my-goto-last-relevant-python-line))
 
 (defun my-Shell-script-mode-bindings ()
   "This function contains custom key bindings intended for use in 
