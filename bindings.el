@@ -1,4 +1,4 @@
-(global-set-key (kbd "C-x C-ö") 'my-find-region-or-at-point)
+(global-set-key (kbd "C-x C-ö") 'my-find-or-browse-region-or-at-point)
 
 (global-set-key (kbd "M-ö") 'my-immediately-switch-to-buffer)
 
