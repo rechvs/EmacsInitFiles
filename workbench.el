@@ -3,7 +3,7 @@
   "Regexp with which to identify a URL."
   :type '(regexp))
 
-(defun my-find-or-browse-region-or-at-point-complicated (&optional arg)
+(defun my-find-or-browse-region-or-at-point (&optional arg)
   "Use a string as a local filename or a URL which to visit or browse.
 If region is active, use text in region as the string; otherwise use text around point.
 The characters delimiting the string from surrounding text are set via `my-find-region-or-at-point-delim-chars'.
