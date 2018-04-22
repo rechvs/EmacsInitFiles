@@ -106,3 +106,8 @@
 (defvar my-newline-at-col
   78
   "Target column for `my-newline-at'.")
+
+(defcustom my-regexp-url-identifier
+  "^file://\\|^mailto:\\|^\\(ftp://\\|https?://\\|www\\.\\).*\\.org\\|\\.\\(com\\|de\\)"
+  "Regexp with which to identify a URL."
+  :type '(regexp))
