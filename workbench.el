@@ -4,12 +4,13 @@
   :type '(regexp))
 
 (defun my-find-or-browse-region-or-at-point (&optional arg)
-  "Use a string as a local filename or a URL which to visit or browse.
-If region is active, use text in region as the string; otherwise use text around point.
-The characters delimiting the string from surrounding text are set via `my-find-region-or-at-point-delim-chars'.
-`my-regexp-url-identifier' determines what constitutes a URL; every string not matching it is considered a local filename.
-Without prefix argument ARG, a non-existent local filename results in an error.
-An empty string results in an error."
+  "Use a string as a local filename/a URL which to visit/browse. If region is 
+active, use text in region as the string; otherwise use text around point. 
+The characters delimiting the string from surrounding text are set via 
+`my-find-region-or-at-point-delim-chars'. `my-regexp-url-identifier' 
+determines what constitutes a URL; every string not matching it is considered 
+a local filename. Without prefix argument ARG, a non-existent local filename 
+results in an error. An empty string results in an error."
   (interactive "P")
   (let* ((flnm (if (region-active-p)
                    (buffer-substring-no-properties (region-beginning) (region-end))
