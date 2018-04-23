@@ -894,6 +894,16 @@ C-c C-p    ess-eval-paragraph"
 C-d    gnus-summary-delete-article"
   (local-set-key (kbd "C-d") 'gnus-summary-delete-article))
 
+(defun my-Inferior-Python-mode-bindings ()
+  "This function contains custom key bindings intended for use in Inferior 
+Python mode. The bindings are:
+C-M-n    forward-list (in `compilation-shell-minor-mode-map')
+C-M-p    backward-list (in `compilation-shell-minor-mode-map')"
+  (define-key compilation-shell-minor-mode-map (kbd "C-M-n")
+    'forward-list)
+  (define-key compilation-shell-minor-mode-map (kbd "C-M-p")
+    'backward-list))
+
 (defun my-LaTeX/P-mode-bindings ()
   "This function contains custom key bindings intended for use in LaTeX/P 
 mode. The bindings are:
