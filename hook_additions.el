@@ -24,6 +24,9 @@
 (add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-bindings)
 (add-hook 'gnus-summary-mode-hook 'my-set-message-signature)
 
+(add-hook 'inferior-python-mode-hook 'anaconda-eldoc-mode)
+(add-hook 'inferior-python-mode-hook 'anaconda-mode)
+
 (add-hook 'LaTeX-mode-hook '(lambda () (setq my-move-end-of-line-skip-regexp "\\([ 	]+%+.*\\)\\|\\([ 	]+\\)")))
 (add-hook 'LaTeX-mode-hook '(lambda () (setq TeX-command-default "LatexMake"))) ; The string must correspond to a handle in variable "TeX-command-list".
 (add-hook 'LaTeX-mode-hook 'my-LaTeX/P-mode-bindings)
