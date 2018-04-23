@@ -26,6 +26,7 @@
 
 (add-hook 'inferior-python-mode-hook 'anaconda-eldoc-mode)
 (add-hook 'inferior-python-mode-hook 'anaconda-mode)
+(add-hook 'inferior-python-mode-hook 'my-Inferior-Python-mode-bindings)
 
 (add-hook 'LaTeX-mode-hook '(lambda () (setq my-move-end-of-line-skip-regexp "\\([ 	]+%+.*\\)\\|\\([ 	]+\\)")))
 (add-hook 'LaTeX-mode-hook '(lambda () (setq TeX-command-default "LatexMake"))) ; The string must correspond to a handle in variable "TeX-command-list".
