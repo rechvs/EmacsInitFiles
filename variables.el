@@ -56,6 +56,22 @@
   200
   "The index of the next private Emacs issue.")
 
+(defcustom my-email-addressees-regexp
+  ""
+  "Regexp matching user names used for my email addresses."
+  :type '(regexp))
+
+(defcustom my-email-addresses-regexp
+  ""
+  "Regexp matching my email addresses."
+  :type '(regexp))
+
+(defcustom my-email-undisclosed-recipients-regexp
+  "^[uU]ndisclosed[- ]recipients$"
+  "Regexp to match placeholder To: or Cc: headers of emails for which the
+sender had only set the Bcc: header."
+  :type '(regexp))
+
 (defcustom my-files-to-visit-at-startup
   '("/home/renke/Privat/Privat.org")
   "A list of paths to files which ought to be visited at startup."
