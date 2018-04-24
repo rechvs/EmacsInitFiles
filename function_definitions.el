@@ -253,9 +253,10 @@ non-empty line."
   (find-file "/ssh:lukas@134.76.19.175:/home/lukas"))
 
 (defun my-immediately-switch-to-buffer ()
-  "Immediately switch to the most recently selected buffer other than the
-current buffer, disregarding buffers already visible. If called in succession,
-cycle through the list returned by `buffer-list'."
+  "Immediately switch to the most recently selected buffer other than the 
+current buffer, disregarding buffers already visible and buffers whose names 
+match `my-immediately-switch-to-buffer-excluded-buffers'. If called in 
+succession, cycle through the list returned by `buffer-list'."
   (interactive)
   (let (WINDOW-LIST (WINDOW_NR 0) (BUFFER-NAME-LIST (list "")) (BUFFER_NR 0) (BUFFER_NEXT_IN_ROW ""))
     (catch 'CATCH
