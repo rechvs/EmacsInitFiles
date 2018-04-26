@@ -18,7 +18,7 @@ function interfaces with Gnus."
       (setq to-cc-all (mapcar (lambda (arg)
                                 (setq arg (replace-regexp-in-string "^ +" "" arg))
                                 (if (string-match "^\\(.+\\)[ 	]*<" arg)
-                                    (replace-regexp-in-string "^[\"'\\ 	]*\\|[\"'\\ 	]*$" "" (substring arg (match-beginning 1) (match-end 1)))
+                                    (replace-regexp-in-string "^[\"'\\ 	]*\\|[\"'\\ 	]*$" "" (rfc2047-decode-string (substring arg (match-beginning 1) (match-end 1)) t))
                                   (if (string-match "<?\\([^<]*@[^>]*\\)>?" arg)
                                       (substring arg (match-beginning 1) (match-end 1))
                                     nil)))
