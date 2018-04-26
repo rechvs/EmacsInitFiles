@@ -15,6 +15,7 @@
 (add-hook 'elpy-mode-hook 'my-Elpy-mode-bindings)
 
 (add-hook 'emacs-lisp-mode-hook 'my-Emacs-Lisp-mode-bindings)
+(add-hook 'emacs-lisp-mode-hook '(lambda () (setq my-move-end-of-line-skip-regexp "\\([ 	]+;+.*\\)\\|\\([ 	]+\\)")))
 
 (add-hook 'ess-mode-hook 'my-ESS_S_-mode-bindings)
 
