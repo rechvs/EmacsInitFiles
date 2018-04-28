@@ -20,10 +20,14 @@ function interfaces with Gnus."
            to-cc-all-format-string
            (to-cc-all-string "NA")
            (email-address-regexp1 "<\\([^<]*@[^>]*\\)>")
-           (email-address-regexp2 "\\([^<]*@[^>]*\\)"))
+           (email-address-regexp2 "\\(.*@.*\\)"))
       (unwind-protect
           (progn
             ;; Process From: header.
+            (setq from (replace-regexp-in-string "[ 	]+" " " from))
+            (while (or (string-match "\\(.*\"\\)\\([^,\"]+\\), \\([^,\"]+\\)\\(\".*\\)" from)
+                       (string-match "\\(.*'\\)\\([^,']+\\), \\([^,']+\\)\\('.*\\)" from))
+              (setq from (concat (match-string 1 from) (match-string 3 from) " " (match-string 2 from) (match-string 4 from))))
             (setq from (mapcar (lambda (arg)
                                  (setq arg (replace-regexp-in-string "^ +" "" arg))
                                  (if (string-match "^\\(.+\\)[ 	]*<" arg)
@@ -40,6 +44,10 @@ function interfaces with Gnus."
                   (setq from-format-string (substring from-format-string 0 (- (length from-format-string) 2)))
                   (setq from-string (apply 'format from-format-string from))))
             ;; Process concatenated To: and Cc: headers.
+            (setq to-cc-all (replace-regexp-in-string "[ 	]+" " " to-cc-all))
+            (while (or (string-match "\\(.*\"\\)\\([^,\"]+\\), \\([^,\"]+\\)\\(\".*\\)" to-cc-all)
+                       (string-match "\\(.*'\\)\\([^,']+\\), \\([^,']+\\)\\('.*\\)" to-cc-all))
+              (setq to-cc-all (concat (match-string 1 to-cc-all) (match-string 3 to-cc-all) " " (match-string 2 to-cc-all) (match-string 4 to-cc-all))))
             (setq to-cc-all (mapcar (lambda (arg)
                                       (setq arg (replace-regexp-in-string "^ +" "" arg))
                                       (if (string-match "^\\(.+\\)[ 	]*<" arg)
@@ -66,7 +74,7 @@ function interfaces with Gnus."
   
 (let ((to-cc-all
        (concat
-        ;; "nora.brinkschulte@gmx.de,niklas_nauroth@web.de,sebastianboeck87@gmail.com,Malteundmax@gmail.com,sonja.kunstmann@gmx.de,swantje.nawratil@gmx.de,bender_thomas@gmx.de,lifedying@163.com,markus.hoffmann.37441@freenet.de,Samira.Mehralian@yahoo.com,rerich.roman1987@gmail.com,kellermann.edgar@gmail.com,sarah.brockmann@posteo.de,hertzdoreen1@googlemail.com,tstolper@kabelmail.de"
+        "nora.brinkschulte@gmx.de,niklas_nauroth@web.de,sebastianboeck87@gmail.com,Malteundmax@gmail.com,sonja.kunstmann@gmx.de,swantje.nawratil@gmx.de,bender_thomas@gmx.de,lifedying@163.com,markus.hoffmann.37441@freenet.de,Samira.Mehralian@yahoo.com,rerich.roman1987@gmail.com,kellermann.edgar@gmail.com,sarah.brockmann@posteo.de,hertzdoreen1@googlemail.com,tstolper@kabelmail.de"
         ;; ", "
         ;; "Renke Christian von Seggern <magic_willebinski@gmx.de>, Someone Else <r.vonseggern@stud.uni-goettingen.de>"
         ;; ", "
@@ -83,15 +91,16 @@ function interfaces with Gnus."
         ;; ", "
         ;; "\"l.sielaff@studentec.de\" <l.sielaff@studentec.de>,  \"carlo.ruedebusch@gmail.com\" <carlo.ruedebusch@gmail.com>,  \"Fabian-ridder@web.de\" <Fabian-ridder@web.de>,  Christian Drieling <christian.drieling@googlemail.com>"
         ;; ", "
+        ;; "\"A B\" <x@y.z>,  A B <x@y.z>,  \"A B\" <x@y.z>, x@y.z,  A B <x@y.z>,  \"D, C\" <x@y.z>,  A B <x@y.z>, \"A B\" <x@y.z>, \"A B\" <x@y.z>,  A B <x@y.z>, \"G H, E F\" <x@y.z>,  A B <x@y.z>, \"A B\" <x@y.z>, \"A B\" <x@y.z>"
+        ;; ", "
         ;; "\"von Seggern, Renke Christian <renke@domain.de>"
         ;; ", "
-        "name@domain.com, Name1.1 Name1.2 <name@domain.com>, \"Name2.2, Name2.1\" <name@domain.com>, \"von Name3.2, Name3.1.1 Name3.1.2\" <name@domain.com>"
         ;; "\"Andreas Woidich\" <a.woidich@best-profile.eu>, \"'Renke Christian von Seggern'\" <renke.vonseggern@gmx.de>,  <s.pommer@best-profile.eu>"
         )))
-  (
-   
-  )
-  (while (or (string-match "\\(.*\\)\"\\([^,\"]+\\), \\([^,\"]+\\)\"\\(.*\\)" to-cc-all)
-             (string-match "\\(.*\\)'\\([^,']+\\), \\([^,']+\\)'\\(.*\\)" to-cc-all))
+  ;; (
+  ;; )
+  (setq to-cc-all (replace-regexp-in-string "[ 	]+" " " to-cc-all))
+  (while (or (string-match "\\(.*\"\\)\\([^,\"]+\\), \\([^,\"]+\\)\\(\".*\\)" to-cc-all)
+             (string-match "\\(.*'\\)\\([^,']+\\), \\([^,']+\\)\\('.*\\)" to-cc-all))
     (setq to-cc-all (concat (match-string 1 to-cc-all) (match-string 3 to-cc-all) " " (match-string 2 to-cc-all) (match-string 4 to-cc-all))))
   to-cc-all)
