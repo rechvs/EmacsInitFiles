@@ -222,7 +222,8 @@ lines terminating blocks)."
       (let ((match-data-old (match-data))
             (cur-line-indented (looking-at "^[ \t]+[^\n]")))
         (forward-line)
-        (while (and (looking-at "^\n") (not cur-line-indented))
+        (while (or (and (looking-at "^\n") (not cur-line-indented))
+                   (looking-at comment-start))
           (forward-line))
         (set-match-data match-data-old))))
 
