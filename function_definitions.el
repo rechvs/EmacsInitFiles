@@ -269,15 +269,16 @@ separated windows and activate follow-mode."
 
 (defun my-goto-last-relevant-python-line ()
   "Move point to last relevant line of Python code above current line. 
-Usually this means to skip over all preceding empty lines (including 
-whitespace-only lines), unless an empty line is preceded by an indented 
-non-empty line."
+Usually this means to skip over all preceding commented and empty lines 
+(including whitespace-only lines), unless an empty line is preceded by an 
+indented non-empty line."
   (interactive)
   (let ((match-data-old (match-data)))
     (unwind-protect
         (progn
           (forward-line -1)
-          (while (and (looking-at "^[ \t]*\n") (save-excursion (forward-line -1) (not (looking-at "^[ \t]+[^\n]"))))
+          (while (or (and (looking-at "^[ \t]*\n") (save-excursion (forward-line -1) (not (looking-at "^[ \t]+[^\n]"))))
+                     (looking-at comment-start))
           (forward-line -1)))
       (set-match-data match-data-old))))
 
