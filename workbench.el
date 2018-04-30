@@ -5,13 +5,16 @@ this is the output of either \"print(FUNC.__doc__)\", or, if that is empty, \"he
   The documentation is then shown in buffer \"*help[Python3](FUNC)*\"."
   (interactive)
   (let* ((proc-name "py3-doc-gen")
-         (assoc-buf-name "*Python3 Documentation Generator*")
-         (proc (get-process proc-name))
+         ;; (assoc-buf-name "*Python3 Documentation Generator*")
+         ;; (proc (get-process proc-name))
          (skippable-chars "a-z0-9")
          func
-         (func-initial ""))
+         (func-initial "")
+         buf-name
+         doc-command
+         )
 
-    (unless proc (setq proc (start-process proc-name assoc-buf-name "/usr/bin/python3")))
+    ;; (unless proc (setq proc (start-process proc-name assoc-buf-name "/usr/bin/python3")))
     (if (and func (not (stringp func))) (error "Function name must be a string"))
     ;; If the region is active, obtain function name from it.
     (if (region-active-p)
@@ -25,22 +28,13 @@ this is the output of either \"print(FUNC.__doc__)\", or, if that is empty, \"he
         (setq func-initial (buffer-substring-no-properties p1 p2))))
     ;; Prompt for function name
     (setq func (completing-read "Function: " nil nil nil func-initial))
-
-    (while (null (get-process proc-name))
-      (sleep-for 0.1))
-    ;; TODO: properly send input to process
-    (process-send-string proc (concat "print(" func ".__doc__)"))
-
-
-
-    ;; BEGIN TESTING
-    ;; (if (and func (null (stringp func))) (error "Function name must be a string"))
-    ;; (display-message-or-buffer (prin1-to-string (and func (null (stringp func)))))
-    ;; (display-message-or-buffer (prin1-to-string (if (and func (null (stringp func))) "func is not a string" "func is a string")))
-    ;; ))
-    ;; (display-message-or-buffer (if (stringp func) func (prin1-to-string func)))
-    ;; END TESTING
-
+    ;; Create help buffer if necessary. Display help buffer.
+    (setq buf-name (concat "*help[Python3](" func ")*"))
+    (setq doc-command (concat "print(" func ".__doc__)"))
+    (unless (get-buffer buf-name) (start-process proc-name buf-name "/usr/bin/python3" "-c" doc-command))
+    (unless (member buf-name (mapcar (lambda (window)
+                                       (buffer-name (window-buffer window)))
+                                     (window-list)))
+      (display-buffer buf-name))
+    
     ))
-
-
