@@ -55,3 +55,4 @@ this is the output of either \"print(FUNC.__doc__)\", or, if that is empty, \"he
             (other-window 1)))
       (set-match-data match-data-old)
       (set-buffer cur-buf))))
+;; TODO: set "quit-restore" parameter of window displaying the help buffer to 3 (see help on "quit-window") and write major mode for viewing Python help buffers which binds "quit-window" to "q"
