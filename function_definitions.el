@@ -953,9 +953,9 @@ mode. The bindings are:
 C-c C-u    my-comment-or-uncomment
 RET        reindent-then-newline-and-indent
 C-c C-y    my-delete-and-insert-blank-lines"
-  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
-  (local-set-key "\r" 'reindent-then-newline-and-indent)
-  (local-set-key "\C-c\C-y" 'my-delete-and-insert-blank-lines))
+  (local-set-key (kbd "C-c C-u") 'my-comment-or-uncomment)
+  (local-set-key (kbd "RET") 'reindent-then-newline-and-indent)
+  (local-set-key (kbd "C-c C-y") 'my-delete-and-insert-blank-lines))
 
 (defun my-LaTeX/P-mode-symbol-additions ()
   "This function uses `TeX-add-symbols´ to add symbols to the list of symbols 
