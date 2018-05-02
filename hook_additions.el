@@ -41,6 +41,8 @@
 
 (add-hook 'octave-mode-hook 'my-Octave-mode-bindings)
 
+(add-hook 'plain-tex-mode-hook 'my-LaTeX/P-mode-bindings)
+
 (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
 (add-hook 'python-mode-hook 'anaconda-mode)
 (add-hook 'python-mode-hook 'my-Python-mode-bindings)
