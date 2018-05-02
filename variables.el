@@ -15,10 +15,10 @@
 (put 'TeX-command-buffer 'disabled t)
 (put 'save-buffers-kill-terminal 'disabled t)
 
-;; Add "/usr/local/texlive/2017/bin/i386-linux" to "PATH" so AUCTeX finds it (http://tex.stackexchange.com/questions/24510/pdflatex-fails-within-emacs-app-but-works-in-terminal).
+;; Add "/usr/local/texlive/2018/bin/i386-linux" to "PATH" so AUCTeX finds it (http://tex.stackexchange.com/questions/24510/pdflatex-fails-within-emacs-app-but-works-in-terminal).
 (setenv "PATH"
         (concat
-         "/usr/local/texlive/2017/bin/i386-linux"
+         "/usr/local/texlive/2018/bin/i386-linux"
          ":"
 
          (getenv "PATH")))
