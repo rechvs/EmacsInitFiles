@@ -517,8 +517,8 @@ string1)
         (setq man-buffer (man prog-name-and-sec-num))
         ;; Wait for the man subprocess to finish.
         (while (process-status "man") (sleep-for 0.01))
-        ;; Switch to the man page buffer in another window.
-        (switch-to-buffer-other-window man-buffer)
+        ;; If the process was successful, switch to the man page buffer in another window.
+        (if (buffer-live-p man-buffer) (switch-to-buffer-other-window man-buffer))
         ;; If the sections list in "Man-switches" is outdated, inform about it.
         (if (not (string-match-p (apply 'format format-string my-man-known-sections-only) Man-switches))
             (display-message-or-buffer (concat "The sections list in Man-switches seems to be outdated (updated value: " (apply 'format format-string my-man-known-sections-only) ").")))))
