@@ -359,18 +359,11 @@ succession, cycle through the list returned by `buffer-list'."
     (message-position-point)))
 
 (defun my-man (&optional prefix-arg)
-  "Use text in region or around point as the program name (and section number
-if present) for which to display the man page(s). Supported formats for
-guessing the section number are: SECNUM PROGNAME, PROGNAME(SECNUM), PROGNAME
-(SECNUM). If called with a prefix argument, reset the following variables
-based on the output of \"apropos -l .\": `my-man-known-programs-only',
-`my-man-known-programs-plus-sections',
-`my-man-known-programs-skip-chars-string', `my-man-known-sections-only', and
-`my-man-known-sections-regexp'."
+  "Use text in region or around point as the name of the man page (and section number if present) to be displayed. Supported formats for guessing the section number are: SECNUM PAGNAM, PAGNAM(SECNUM), PAGNAM (SECNUM). If called with a prefix argument, reset the following variables based on the output of \"apropos -l .\": `my-man-known-programs-only', `my-man-known-programs-plus-sections', `my-man-known-programs-skip-chars-string', `my-man-known-sections-only', and `my-man-known-sections-regexp'."
   (interactive "P")
   (let ((cntr 0)
 (format-string "")
-input-initial
+input-def
 input-user
 list1
 list2
@@ -381,6 +374,7 @@ man-buffer
 prog-name
 prog-name-and-sec-num
 prog-names-skip-chars-string
+prompt
 sec-num
 sec-num-after
 sec-num-before
@@ -395,11 +389,11 @@ string1)
                                   'my-man-known-programs-skip-chars-string
                                   'my-man-known-sections-only
                                   'my-man-known-sections-regexp))
-      ;; If not already available, create several lists related to the program names and section numbers known to man.
+      ;; If not already available, create several lists related to the known man page names and section numbers.
       (if (or (not my-man-known-programs-plus-sections) (not my-man-known-programs-only) (not my-man-known-sections-only) (not my-man-known-sections-regexp) (not my-man-known-programs-skip-chars-string) prefix-arg)
           (progn
-            (display-message-or-buffer "Rebuilding the list of all program names plus section numbers known to man...")
-            ;; Store the list of all program names and corresponding section numbers known to man in "list1".
+            (display-message-or-buffer "Rebuilding the list of all know man page names plus section numbers...")
+            ;; Store the list of all known man page names and corresponding section numbers in "list1".
             (setq string1 (shell-command-to-string "apropos -l ."))
             (setq string1 (replace-regexp-in-string " (" "(" (replace-regexp-in-string ",$" "" (replace-regexp-in-string " +- .*\n" "," string1))))
             (setq list1 (split-string string1 ","))
@@ -414,12 +408,12 @@ string1)
             (setq format-string (concat "\\(" (substring format-string 0 (- (length format-string) 2)) "\\)"))
             (setq list2 (sort list2 'string<))
             (setq sec-nums-regexp (apply 'format format-string list2))
-            ;; Store program names only in "list3".
+            ;; Store man page names only in "list3".
             (setq list3 (mapcar (lambda
                                   (prog-name-plus-sec-num)
                                   (substring prog-name-plus-sec-num 0 (string-match (concat "(" sec-nums-regexp ")$") prog-name-plus-sec-num)))
                                 list1))
-            ;; Store names of programs with man pages in multiple sections in "list4".
+            ;; Store names of man pages contained in multiple sections in "list4".
             (setq list4 (delq nil (delete-dups (mapcar (lambda
                                                          (prog-name-only)
                                                          (if (> (count prog-name-only list3 :test 'equal) 1)
@@ -453,17 +447,17 @@ string1)
                       (progn (warn "The previous value of `%s' seems to be outdated." cur-permanent-var-symbol)
                              (set cur-permanent-var-symbol (symbol-value cur-temporary-var-symbol)))))
                 (setq cntr (1+ cntr))))))
-      ;; If the region is active, obtain program name and, if present, section number from it.
+      ;; If the region is active, obtain man page name and, if present, section number from it.
       (if (region-active-p)
           (progn
             (setq prog-name-and-sec-num (buffer-substring-no-properties (region-beginning) (region-end)))
-            ;; Check whether the section number is mentioned before the program name. If so, extract it and the program name.
+            ;; Check whether the section number is mentioned before the man page name. If so, extract it and the man page name.
             (setq sec-num-before (string-match (concat "^" my-man-known-sections-regexp " ") prog-name-and-sec-num))
             (if sec-num-before
                 (progn
                   (setq sec-num-before (match-string 1 prog-name-and-sec-num))
                   (setq prog-name (substring prog-name-and-sec-num (match-end 0)))))
-            ;; Check whether the section number is mentioned after the program name. If so, extract it and the program name.
+            ;; Check whether the section number is mentioned after the man page name. If so, extract it and the man page name.
             (setq sec-num-after (string-match (concat " ?[(]?" my-man-known-sections-regexp ")?$") prog-name-and-sec-num))
             (if (and sec-num-after (not sec-num-before)) ;We also check that "sec-num-before" is unset because that should be preferred over "sec-num-after".
                 (progn
@@ -480,7 +474,7 @@ string1)
             ;; If the "prog-name" hasn't been set by now, use the original region content.
             (if (not prog-name)
                 (setq prog-name prog-name-and-sec-num)))
-        ;; If the region is not active, obtain the program name and, if present, the section number by scanning for text at point enclosed in the delimiting characters.
+        ;; If the region is not active, obtain the man page name and, if present, the section number by scanning for text at point enclosed in the delimiting characters.
         (let (p1 p2)
           (save-excursion (skip-chars-backward my-man-known-programs-skip-chars-string (point-min))
                           (setq p1 (point))
@@ -492,19 +486,20 @@ string1)
                               (setq sec-num (match-string 1))))
           (setq prog-name (buffer-substring p1 p2))))
       ;; Prompt for user input.
-      (setq input-initial (if (and (not (null prog-name)) (not (string= "" prog-name)) (not (null sec-num)) (not (string= "" sec-num)))
+      (setq input-def (if (and (not (null prog-name)) (not (string= "" prog-name)) (not (null sec-num)) (not (string= "" sec-num)))
                               (concat prog-name "(" sec-num ")")
                             prog-name))
-      (set-text-properties 0 (length input-initial) nil input-initial)
-      (setq input-user (completing-read "Program name[(section)]: " my-man-known-programs-plus-sections nil 'confirm input-initial 'my-man-input-hist))
+      (set-text-properties 0 (length input-def) nil input-def)
+      (setq prompt (if (string= "" input-def) "man page name[(section)]: " (concat "man page name[(section)] (default " input-def "): "))) 
+      (setq input-user (completing-read prompt my-man-known-programs-plus-sections nil 'confirm nil 'my-man-input-hist input-def))
       (setq my-man-input-hist (nconc (delq nil my-man-input-hist) (list input-user)))
       ;; If active, deactivate mark.
       (if (region-active-p)
           (deactivate-mark))
       ;; If "input-user" is empty, signal an error.
       (if (string= "" input-user)
-          (error "Missing program name")
-        ;; Else, extract program name and section number from "input-user" and concatenate them appropriately.
+          (error "Missing man page name")
+        ;; Else, extract man page name and section number from "input-user" and concatenate them appropriately.
         (setq sec-num (if (string-match "(\\(.*\\))$" input-user)
                           (match-string 1 input-user)))
         (setq prog-name (if sec-num
@@ -521,8 +516,7 @@ string1)
         ;; Invoke man.
         (setq man-buffer (man prog-name-and-sec-num))
         ;; Wait for the man subprocess to finish.
-        (while (process-status "man")
-          (sleep-for 0.01))
+        (while (process-status "man") (sleep-for 0.01))
         ;; Switch to the man page buffer in another window.
         (switch-to-buffer-other-window man-buffer)
         ;; If the sections list in "Man-switches" is outdated, inform about it.
