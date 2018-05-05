@@ -1,5 +1,7 @@
 (defun my-view-python-object-help ()
-  "Prompt for a Python object name, using either the region or the text around point as default. Display the output of \"help(\"OBJECT\")\" in a dedicated buffer."
+  "Prompt for a Python3 object name, using either the region or the text 
+around point as default. Display the output of \"help(\"OBJECT\")\" in a 
+dedicated buffer."
   (interactive)
   (let* ((cur-buf (current-buffer))
          (proc-name "py3-doc-gen")
