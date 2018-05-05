@@ -38,7 +38,7 @@
            TeX-arg-cite)))
       LaTeX-dialect)))
 
-;; Load certain variables whose standard value are too long to include directly in this file.
+;; Load certain variables whose standard value is too long to include directly in this file.
 (load "~/.emacs.d/init-files/variables/my-man-known-programs-only.el" t t)
 (load "~/.emacs.d/init-files/variables/my-man-known-programs-plus-sections.el" t t)
 
