@@ -11,8 +11,7 @@ this is the output of either \"print(FUNC.__doc__)\", or, if that is empty, \"he
          (func-initial "")
          buf-name
          doc-command
-         (match-data-old (match-data))
-         )
+         (match-data-old (match-data)))
     (unwind-protect
         (progn
           (if (and func (not (stringp func))) (error "Function name must be a string"))
@@ -51,8 +50,8 @@ this is the output of either \"print(FUNC.__doc__)\", or, if that is empty, \"he
                                        (window-list)))
               (display-message-or-buffer (concat "Python documentation for " func " already displayed."))
             (switch-to-buffer-other-window buf-name)
+            (help-mode)                 ; Temporary fix until I have written a proper major mode for viewing (and quitting) Python help buffers.
             (goto-char (point-min))
             (other-window 1)))
       (set-match-data match-data-old)
       (set-buffer cur-buf))))
-;; TODO: set "quit-restore" parameter of window displaying the help buffer to 3 (see help on "quit-window") and write major mode for viewing Python help buffers which binds "quit-window" to "q"
