@@ -359,7 +359,14 @@ succession, cycle through the list returned by `buffer-list'."
     (message-position-point)))
 
 (defun my-man (&optional prefix-arg)
-  "Use text in region or around point as the name of the man page (and section number if present) to be displayed. Supported formats for guessing the section number are: SECNUM PAGNAM, PAGNAM(SECNUM), PAGNAM (SECNUM). If called with a prefix argument, reset the following variables based on the output of \"apropos -l .\": `my-man-known-programs-only', `my-man-known-programs-plus-sections', `my-man-known-programs-skip-chars-string', `my-man-known-sections-only', and `my-man-known-sections-regexp'."
+  "Use text in region or around point as the name of the man page (and 
+section number if present) to be displayed. Supported formats for guessing 
+the section number are: SECNUM PAGNAM, PAGNAM(SECNUM), PAGNAM (SECNUM). If 
+called with a prefix argument, reset the following variables based on the 
+output of \"apropos -l .\": `my-man-known-programs-only', 
+`my-man-known-programs-plus-sections', 
+`my-man-known-programs-skip-chars-string', `my-man-known-sections-only', and 
+`my-man-known-sections-regexp'."
   (interactive "P")
   (let ((cntr 0)
 (format-string "")
