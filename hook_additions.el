@@ -39,6 +39,8 @@
 
 (add-hook 'lisp-interaction-mode-hook 'my-Lisp-Interaction-mode-bindings)
 
+(add-hook 'message-send-hook 'my-message-check-for-mail-attachment)
+
 (add-hook 'octave-mode-hook 'my-Octave-mode-bindings)
 
 (add-hook 'plain-TeX-mode-hook 'my-LaTeX/P-mode-bindings)
