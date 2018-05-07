@@ -253,7 +253,7 @@ results in an error. An empty string results in an error."
               (if flnm-is-url (browse-url flnm) (error "File %s does not exist" flnm)))))
       (set-match-data match-data-old))))
 
-(defun my-follow-bookmark (BKMK)
+(defun my-follow-bookmark ()
   "Call (`delete-other-windows'), open bookmark BKMK in two vertically
 separated windows and activate follow-mode."
   (interactive)
@@ -969,6 +969,16 @@ gitignore whitelist. Visit the file."
 ;; Functions for mode dependent key bindings. ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun my-Elpy-mode-bindings ()
+  "This function contains custom key bindings intended for use in Elpy 
+mode. The bindings are:
+C-c C-n    my-elpy-shell-send-line
+C-c C-p    my-goto-last-relevant-python-line"
+  (define-key elpy-mode-map (kbd "C-c C-n")
+    'my-elpy-shell-send-line)
+  (define-key elpy-mode-map (kbd "C-c C-p")
+    'my-goto-last-relevant-python-line))
+
 (defun my-Emacs-Lisp-mode-bindings ()
   "This function contains custom key bindings intended for use in
 Emacs-Lisp mode. The bindings are: 
@@ -991,8 +1001,10 @@ C-d    gnus-summary-delete-article"
 (defun my-Inferior-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Inferior 
 Python mode. The bindings are:
+C-c C-v  my-view-python-object-help
 C-M-n    forward-list (in `compilation-shell-minor-mode-map')
 C-M-p    backward-list (in `compilation-shell-minor-mode-map')"
+  (local-set-key (kbd "C-c C-v") 'my-view-python-object-help)
   (define-key compilation-shell-minor-mode-map (kbd "C-M-n")
     'forward-list)
   (define-key compilation-shell-minor-mode-map (kbd "C-M-p")
@@ -1050,18 +1062,11 @@ M-p        org-end-of-line"
 (defun my-Python-mode-bindings ()
   "This function contains custom key bindings intended for use in Python 
 mode. The bindings are:
-C-c C-u    my-comment-or-uncomment"
-  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
-
-(defun my-Elpy-mode-bindings ()
-  "This function contains custom key bindings intended for use in Elpy 
-mode. The bindings are:
-C-c C-n    my-elpy-shell-send-line
-C-c C-p    my-goto-last-relevant-python-line"
-  (define-key elpy-mode-map (kbd "C-c C-n")
-    'my-elpy-shell-send-line)
-  (define-key elpy-mode-map (kbd "C-c C-p")
-    'my-goto-last-relevant-python-line))
+C-c C-u    my-comment-or-uncomment
+C-c C-v    my-view-python-object-help (in `elpy-mode-map')"
+  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
+  (define-key elpy-mode-map (kbd "C-c C-v")
+    'my-view-python-object-help))
 
 (defun my-Shell-script-mode-bindings ()
   "This function contains custom key bindings intended for use in 
