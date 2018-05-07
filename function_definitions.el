@@ -524,6 +524,23 @@ string1)
             (display-message-or-buffer (concat "The sections list in Man-switches seems to be outdated (updated value: " (apply 'format format-string my-man-known-sections-only) ").")))))
   (set-match-data match-data-old))))
 
+(defun my-message-check-for-mail-attachment ()
+  "Ask for confirmation for sending the current buffer if it mentions an 
+attachment without containing one. This function is meant to be called via 
+`message-send-hook'."
+  ()
+  (let ((attmnt-mention-regexp "[Aa]ttachment\\|[Aa]ttached\\|[Aa]nhang\\|[Aa]ngehängt")
+        (attmnt-contain-regexp "^<#part.*disposition=attachment>$")
+        (continue-prompt "No attachment detected. Continue sending? ")
+        (error-message "Sending aborted")
+        (match-data-old (match-data)))
+    (unwind-protect
+        (and (save-excursion (goto-char (point-min)) (re-search-forward attmnt-mention-regexp (point-max) t))
+             (save-excursion (goto-char (point-min)) (null (re-search-forward attmnt-contain-regexp (point-max) t)))
+             (null (yes-or-no-p continue-prompt))
+             (error error-message))
+      (set-match-data match-data-old))))
+
 (defun my-move-beginning-of-line ()
   "If point is not at the end of text matching
 `my-move-beginning-of-line-skip-regexp', move point
