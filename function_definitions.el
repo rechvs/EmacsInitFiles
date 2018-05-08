@@ -212,9 +212,11 @@ If point is not on a blank line do nothing."
       (message "Current line is not blank\."))))
 
 (defun my-delete-parens-content ()
-  "If a matching pair of opening and closing parentheses before and after 
-point is found, delete all text between it. \"Parentheses\" here means the 
-following characters: \"()\", \"[]\", and \"{}\"."
+  "Delete text between the opening and closing parentheses before and after 
+point. While looking for the opening parenthesis before point, do not travel 
+across closing parentheses. While looking for the matching closing 
+parenthesis, do travel across balanced parentheses. \"Parentheses\" here 
+means the following characters: \"()\", \"[]\", and \"{}\". "
   (interactive)
   (let ((error-message-1 "No opening parenthesis found")
         (error-message-2 "Not inside balanced parentheses")
@@ -222,6 +224,7 @@ following characters: \"()\", \"[]\", and \"{}\"."
         opening-paren
         closing-paren
         (opening-parens-regexp "(\\|\\[\\|{")
+        (parens-level 0)
         (match-data-old (match-data)))
     (unwind-protect
         (save-excursion
@@ -234,8 +237,18 @@ following characters: \"()\", \"[]\", and \"{}\"."
           (setq closing-paren (cond ((string= "(" opening-paren) ")")
                                     ((string= "[" opening-paren) "]")
                                     ((string= "{" opening-paren) "}")))
-          (skip-chars-forward (concat "^" closing-paren) (point-max))
-          (or (looking-at (regexp-quote closing-paren)) (error error-message-2))
+          (goto-char (1+ (point)))
+          (while (or (> parens-level 0) (null (looking-at (regexp-quote closing-paren))))
+            (if (= (point) (point-max)) (error error-message-2))
+            (if (looking-at (regexp-quote opening-paren))
+                (progn
+                  (setq parens-level (1+ parens-level))
+                  (goto-char (1+ (point))))
+              (if (looking-at (regexp-quote closing-paren))
+                  (progn
+                    (setq parens-level (1- parens-level))
+                    (goto-char (1+ (point))))))
+            (skip-chars-forward (concat "^" opening-paren closing-paren) (point-max)))
           (delete-region parens-beg (point)))
       (set-match-data match-data-old))))
 
