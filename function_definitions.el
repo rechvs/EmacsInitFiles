@@ -839,7 +839,7 @@ dedicated buffer."
   (interactive)
   (let* ((cur-buf (current-buffer))
          (proc-name "py3-doc-gen")
-         (skippable-chars "a-zA-Z0-9")
+         (skippable-chars "a-zA-Z0-9._")
          obj
          (obj-def-input "")
          buf-name
