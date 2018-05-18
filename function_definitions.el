@@ -383,6 +383,35 @@ succession, cycle through the list returned by `buffer-list'."
           ;; Switch to buffer "BUFFER_NEXT_IN_ROW".
           (switch-to-buffer BUFFER_NEXT_IN_ROW))))))
 
+(defun my-insert-enclosing-parens (arg-raw arg-num reg-beg reg-end)
+  "In Transient Mark mode, if the mark is active, insert opening and closing 
+parentheses around the region and deactivate the mark, leaving point after 
+the closing parenthesis. If raw prefix argument ARG-RAW is non-nil, insert as 
+many nested opening and closing parentheses at point as raw prefix arguments 
+were used, leaving point inside them. Otherwise, insert as many opening 
+parenthesis at point as specified by the numeric prefix argument ARG-NUM."
+  (interactive "P\np\nr")
+  (let ((reg-beg (and (use-region-p) reg-beg))
+        (reg-end (and (use-region-p) reg-end))
+        (cur-point (point))
+        (arg-raw-rep-cntr (and arg-raw (listp arg-raw) (ceiling (log (nth 0 arg-raw) 4))))
+        (rep-cntr 0))
+    (if (and reg-beg reg-end)
+        (progn
+          (goto-char reg-beg)
+          (insert "(")
+          (goto-char (1+ reg-end))
+          (insert ")"))
+      (if (and arg-raw (listp arg-raw))
+          (while (< rep-cntr arg-raw-rep-cntr)
+            (insert "(")
+            (insert ")")
+            (setq rep-cntr (1+ rep-cntr))
+            (goto-char (+ cur-point rep-cntr)))
+        (while (< rep-cntr arg-num)
+          (insert "(")
+          (setq rep-cntr (1+ rep-cntr)))))))
+
 (defun my-LaTeX/P-mode-symbol-additions ()
   "This function uses `TeX-add-symbols´ to add symbols to the list of symbols 
 known by AUCTeX in LaTeX/P mode.
