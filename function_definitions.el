@@ -383,16 +383,16 @@ succession, cycle through the list returned by `buffer-list'."
           ;; Switch to buffer "BUFFER_NEXT_IN_ROW".
           (switch-to-buffer BUFFER_NEXT_IN_ROW))))))
 
-(defun my-insert-enclosing-parens (arg-raw arg-num reg-beg reg-end)
+(defun my-insert-enclosing-parens (arg-raw arg-num)
   "In Transient Mark mode, if the mark is active, insert opening and closing 
 parentheses around the region and deactivate the mark, leaving point after 
 the closing parenthesis. If raw prefix argument ARG-RAW is non-nil, insert as 
 many nested opening and closing parentheses at point as raw prefix arguments 
 were used, leaving point inside them. Otherwise, insert as many opening 
 parenthesis at point as specified by the numeric prefix argument ARG-NUM."
-  (interactive "P\np\nr")
-  (let ((reg-beg (and (use-region-p) reg-beg))
-        (reg-end (and (use-region-p) reg-end))
+  (interactive "P\np")
+  (let ((reg-beg (and (use-region-p) (region-beginning)))
+        (reg-end (and (use-region-p) (region-end)))
         (cur-point (point))
         (arg-raw-rep-cntr (and arg-raw (listp arg-raw) (ceiling (log (nth 0 arg-raw) 4))))
         (rep-cntr 0))
@@ -1088,7 +1088,8 @@ C-c C-p    my-goto-last-relevant-python-line"
   "This function contains custom key bindings intended for use in
 Emacs-Lisp mode. The bindings are: 
 C-c C-u    my-comment-or-uncomment"
-  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment))
+  (local-set-key "\C-c\C-u" 'my-comment-or-uncomment)
+  (local-set-key (kbd "(") 'my-insert-enclosing-parens))
 
 (defun my-ESS_S_-mode-bindings ()
   "This function contains custom key bindings intended for use in ESS[S] 
